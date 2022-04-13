@@ -14,11 +14,26 @@
  * limitations under the License.
  */
 
-public class Cell {
-	public enum Type {
-		WALL,
-		FLOOR,
-		NULL
+import java.awt.Point;
+
+/**
+ * The {@Mole} class represents the 'mole'.
+ * It's moved by a user.
+ * 
+ * @author olegshchepilov
+ *
+ */
+
+public class Mole {
+	
+	public Mole() {}
+	
+	public final Point getCurrentPosition() {
+		return currentPosition;
 	}
-	public Type type = Type.NULL;
+	public void setCurrentPosition(Point newPosition) {
+		currentPosition = newPosition;
+	}
+	
+	private Point currentPosition = new Point(0, 0);
 }

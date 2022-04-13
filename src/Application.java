@@ -51,7 +51,7 @@ public class Application extends JFrame {
 	
 	private void loadDefGame() {
 		currentGame = new Game();
-		currentGame.createDefField();
+		currentGame.createDefGame();
 		appBoard.setGame(currentGame);
 	}
 	

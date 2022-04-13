@@ -19,13 +19,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-import javax.swing.JPanel;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+
+import javax.swing.JPanel;
 
 /**
  * The {@AppBoard} is a panel that is responsible for drawing the board
@@ -68,14 +66,15 @@ public class AppBoard extends JPanel {
 		final Dimension cellSize = new Dimension(workingRect.width / fieldSize.width, workingRect.height / fieldSize.height);
 		for (int rowIndex = 0; rowIndex < fieldSize.height; ++rowIndex) {
 			for (int columnIndex = 0; columnIndex < fieldSize.width; ++columnIndex) {
-				Rectangle cellRect = new Rectangle(workingRect.x + cellSize.width * columnIndex, workingRect.y + cellSize.height * rowIndex, cellSize.width, cellSize.height);
+				Rectangle cellRect = calcCellRect(workingRect, cellSize, columnIndex, rowIndex);
 				drawCell(graphics2d, cellRect, game.getCell(columnIndex, rowIndex));
 			}
 		}
 		
 		// Foreground
-
-		
+		Point molePosition = game.getMolePosition();
+		Rectangle cellRect = calcCellRect(workingRect, cellSize, molePosition.x, molePosition.y);
+		drawImage(graphics2d, cellRect, "mole.png");
 	}
 	
 	private void drawCell(Graphics2D graphics, Rectangle cellRect, Cell cell) {
@@ -83,29 +82,19 @@ public class AppBoard extends JPanel {
 		if (type == Cell.Type.WALL) {
 			graphics.setColor(Color.RED);
 			graphics.fillRect(cellRect.x, cellRect.y, cellRect.width, cellRect.height);
-			try {
-				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-				InputStream input = classLoader.getResourceAsStream("wall.png");
-				Image image =  ImageIO.read(input);
-				graphics.drawImage(image, cellRect.x, cellRect.y, cellRect.width, cellRect.height, null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else if (type == Cell.Type.SPACE) {
+			drawImage(graphics, cellRect, "wall.png");
+		} else if (type == Cell.Type.FLOOR) {
 			graphics.setColor(Color.BLACK);
 			graphics.fillRect(cellRect.x, cellRect.y, cellRect.width, cellRect.height);
-			try {
-				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-				InputStream input = classLoader.getResourceAsStream("floor.png");
-				Image image =  ImageIO.read(input);
-				graphics.drawImage(image, cellRect.x, cellRect.y, cellRect.width, cellRect.height, null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			//graphics.setColor(Color.BLACK);
-			//graphics.fillRect(cellRect.x, cellRect.y, cellRect.width, cellRect.height);
+			drawImage(graphics, cellRect, "floor.png");
 		}
+	}
+	
+	private void drawImage(Graphics2D graphics, Rectangle cellRect, String resourceId) {
+		Image image = ImageStorage.getImage(resourceId);
+		if (image != null) {
+			graphics.drawImage(image, cellRect.x, cellRect.y, cellRect.width, cellRect.height, null);				
+		}		
 	}
 	
 	private Rectangle calcWorkingRect() {
@@ -135,6 +124,10 @@ public class AppBoard extends JPanel {
 		}		
 		
 		return workRect;
+	}
+	
+	private Rectangle calcCellRect(Rectangle workingRect, Dimension cellSize, int x, int y) {
+		return new Rectangle(workingRect.x + cellSize.width * x, workingRect.y + cellSize.height * y, cellSize.width, cellSize.height);
 	}
 
 	static private void deflateRect(Rectangle rect, int dx, int dy) {
