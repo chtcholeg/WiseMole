@@ -34,8 +34,7 @@ public class Application extends JFrame {
 	public Application() {
 		init();
 		
-		loadDefGame();
-		
+		loadGame(1);
 	}
 	
 	private void init() {
@@ -49,9 +48,9 @@ public class Application extends JFrame {
         setLocationRelativeTo(null);
 	}
 	
-	private void loadDefGame() {
+	private void loadGame(int index) {
 		currentGame = new Game();
-		currentGame.createDefGame();
+		currentGame.loadGame("level" + Integer.toString(index) + ".game");
 		appBoard.setGame(currentGame);
 	}
 	

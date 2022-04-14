@@ -22,6 +22,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -75,6 +76,11 @@ public class AppBoard extends JPanel {
 		Point molePosition = game.getMolePosition();
 		Rectangle cellRect = calcCellRect(workingRect, cellSize, molePosition.x, molePosition.y);
 		drawImage(graphics2d, cellRect, "mole.png");
+		List<Point> boxes = game.getBoxes();
+		for (Point box : boxes) {
+			cellRect = calcCellRect(workingRect, cellSize, box.x, box.y);
+			drawImage(graphics2d, cellRect, "box_inactive.png");			
+		}
 	}
 	
 	private void drawCell(Graphics2D graphics, Rectangle cellRect, Cell cell) {

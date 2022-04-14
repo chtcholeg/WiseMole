@@ -44,7 +44,7 @@ public class ImageStorage {
 	private Image loadImage(String resourceId) {
 		try {
 			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			InputStream input = classLoader.getResourceAsStream(resourceId);
+			InputStream input = classLoader.getResourceAsStream("img/" + resourceId);
 			return ImageIO.read(input);			
 		} catch (IOException e) {
 			e.printStackTrace();

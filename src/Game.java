@@ -16,6 +16,16 @@
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 /**
  * The {@Game} class is logical representation of the game.
@@ -33,6 +43,50 @@ final public class Game {
 	}
 	public Point getMolePosition() {
 		return (mole == null) ? new Point(-1, -1) : mole.getCurrentPosition();
+	}
+	public List<Point> getBoxes() {
+		return boxes;
+	}
+	
+	public void loadGame(String gameId) {
+		String[] lines = loadGameData(gameId);
+		if (lines == null || lines.length == 0) {
+			return;
+		}
+		
+		final int maxLineLength = findMaxLineLength(lines);
+		for (int i = 0; i < lines.length; ++i) {
+			if (lines[i].length() < maxLineLength) {
+				lines[i] += String.valueOf('E').repeat(maxLineLength - lines[i].length());
+			}
+		}
+		
+		field = new Field();
+		Point molePoint = new Point();
+		field.setSize(maxLineLength, lines.length);
+		for (int y = 0; y < lines.length; ++y) {
+			String line = lines[y];
+			for (int x = 0; x < maxLineLength; ++x) {
+				Cell cell = field.at(x, y);
+				final char ch = line.charAt(x); 
+				if (ch == 'E') {
+					cell.type = Cell.Type.NULL;					
+				} else if (ch == 'W') {
+					cell.type = Cell.Type.WALL;										
+				} else {
+					cell.type = Cell.Type.FLOOR;															
+				}
+				if (ch == 'M') {
+					molePoint.setLocation(x, y);
+				}
+				if (ch == 'B') {
+					boxes.add(new Point(x, y));
+				}
+			}
+		}
+		
+		mole = new Mole();
+		mole.setCurrentPosition(molePoint);
 	}
 	
 	public void createDefGame() {
@@ -89,6 +143,38 @@ final public class Game {
 		mole.setCurrentPosition(new Point(2, 2));
 	}
 	
+	private String[] loadGameData(String resourceId) {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		try (InputStream input = classLoader.getResourceAsStream("game/" + resourceId)) {
+	        if (input == null) {
+	        	return null;
+	        }
+	        List<String> lineList = new ArrayList<String>();
+	        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	            	lineList.add(line);
+	            }
+	    		String[] result = new String[lineList.size()];
+	    		lineList.toArray(result);
+	    		return result;
+	        } catch (IOException exception) {
+		    }
+	    } catch (IOException exception) {
+	    }
+		
+		return null;
+	}
+	
+	private int findMaxLineLength(String[] lines) {
+		int result = 0;
+		for(String line : lines) {
+			result = Math.max(result, line.length());
+		}
+		return result;
+	}
+	
 	private Field field = null;
 	private Mole mole = null;
+	private List<Point> boxes = new ArrayList<Point>();
 }
