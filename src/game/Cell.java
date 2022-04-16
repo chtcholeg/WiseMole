@@ -13,27 +13,13 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+package game;
 
-import java.awt.Point;
-
-/**
- * The {@Mole} class represents the 'mole'.
- * It's moved by a user.
- * 
- * @author olegshchepilov
- *
- */
-
-public class Mole {
-	
-	public Mole() {}
-	
-	public final Point getCurrentPosition() {
-		return currentPosition;
+public class Cell {
+	public enum Type {
+		WALL,
+		FLOOR,
+		NULL
 	}
-	public void setCurrentPosition(Point newPosition) {
-		currentPosition = newPosition;
-	}
-	
-	private Point currentPosition = new Point(0, 0);
+	public Type type = Type.NULL;
 }

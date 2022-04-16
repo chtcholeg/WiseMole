@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package utils;
+
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;

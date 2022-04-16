@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package game;
+
 import java.awt.Dimension;
 
 /**

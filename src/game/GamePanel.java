@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+package game;
+
+import utils.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -27,19 +31,16 @@ import java.util.List;
 import javax.swing.JPanel;
 
 /**
- * The {@AppBoard} is a panel that is responsible for drawing the board
+ * The {@GamePanel} is a panel that is responsible for drawing the game board
  *
  * @author olegshchepilov
  *
  */
 
-public class AppBoard extends JPanel {
-	public AppBoard() {
-
-	}
-
-	public void setGame(Game newGame) {
-		game = newGame;
+public class GamePanel extends JPanel {
+	public GamePanel(String levelId) {
+		game = new Game();
+		game.loadGame(levelId);
 	}
 
 	@Override
@@ -145,4 +146,5 @@ public class AppBoard extends JPanel {
 
 	private final int padding = 10;
 	private Game game = null;
+	private static final long serialVersionUID = 1L;
 }

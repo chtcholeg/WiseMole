@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import game.*;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * The {@Application} class is main class of Application.
@@ -33,13 +35,11 @@ public class Application extends JFrame {
 	
 	public Application() {
 		init();
-		
-		loadGame(1);
 	}
 	
 	private void init() {
-		appBoard = new AppBoard();
-        add(appBoard);
+		currentPanel = new GamePanel("level1.game");
+        add(currentPanel);
 
         setSize(800, 600);
 
@@ -48,12 +48,7 @@ public class Application extends JFrame {
         setLocationRelativeTo(null);
 	}
 	
-	private void loadGame(int index) {
-		currentGame = new Game();
-		currentGame.loadGame("level" + Integer.toString(index) + ".game");
-		appBoard.setGame(currentGame);
-	}
-	
-	private AppBoard appBoard = null;
-	private Game currentGame = null;
+	private JPanel currentPanel = null;
+	private static final long serialVersionUID = 1L;
+
 }

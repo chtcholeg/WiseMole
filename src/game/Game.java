@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
+package game;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
 
 /**
  * The {@Game} class is logical representation of the game.
@@ -42,7 +40,7 @@ final public class Game {
 		return (field == null) ? null : field.at(columnIndex, rowIndex);
 	}
 	public Point getMolePosition() {
-		return (mole == null) ? new Point(-1, -1) : mole.getCurrentPosition();
+		return (moleLocation == null) ? new Point(-1, -1) : moleLocation;
 	}
 	public List<Point> getBoxes() {
 		return boxes;
@@ -62,7 +60,6 @@ final public class Game {
 		}
 		
 		field = new Field();
-		Point molePoint = new Point();
 		field.setSize(maxLineLength, lines.length);
 		for (int y = 0; y < lines.length; ++y) {
 			String line = lines[y];
@@ -77,16 +74,13 @@ final public class Game {
 					cell.type = Cell.Type.FLOOR;															
 				}
 				if (ch == 'M') {
-					molePoint.setLocation(x, y);
+					moleLocation = new Point(x, y);
 				}
 				if (ch == 'B') {
 					boxes.add(new Point(x, y));
 				}
 			}
 		}
-		
-		mole = new Mole();
-		mole.setCurrentPosition(molePoint);
 	}
 	
 	public void createDefGame() {
@@ -139,8 +133,7 @@ final public class Game {
 		field.at(4, 5).type = Cell.Type.WALL;
 		field.at(5, 5).type = Cell.Type.WALL;
 		
-		mole = new Mole();
-		mole.setCurrentPosition(new Point(2, 2));
+		moleLocation = new Point(2, 2);
 	}
 	
 	private String[] loadGameData(String resourceId) {
@@ -175,6 +168,6 @@ final public class Game {
 	}
 	
 	private Field field = null;
-	private Mole mole = null;
+	private Point moleLocation = new Point(-1, -1);
 	private List<Point> boxes = new ArrayList<Point>();
 }
