@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-import game.*;
+
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import common.*;
+import game.*;
+import menu.*;
 
 /**
  * The {@Application} class is main class of Application.
@@ -27,28 +38,59 @@ import javax.swing.JPanel;
  *
  */
 
-public class Application extends JFrame {
+public class Application extends JFrame implements MainMenuPanel.Callback {
 	public static void main(String[] args) {
 		Application app = new Application();
 		app.setVisible(true);
 	}
 	
 	public Application() {
-		init();
-	}
-	
-	private void init() {
-		currentPanel = new GamePanel("level1.game");
-        add(currentPanel);
+		initFont();
+		
+		setPanel(new MainMenuPanel(this));
 
-        setSize(800, 600);
+        setSize(ApplicationDefines.FRAME_WIDTH, ApplicationDefines.FRAME_HEIGHT);
 
         setTitle("Wise Mole");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 	}
 	
-	private JPanel currentPanel = null;
+	private void initFont() {
+		try {
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			InputStream input = classLoader.getResourceAsStream("font/pixy/PIXY.ttf");
+		    applicationFont = Font.createFont(Font.TRUETYPE_FONT, input).deriveFont(ApplicationDefines.FONT_SIZE);
+		    GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		    graphicsEnvironment.registerFont(applicationFont);
+		} catch (IOException | FontFormatException e) {
+		    e.printStackTrace();
+		}
+	}
+	
+	// MainMenuPanel.Callback
+	@Override
+	public void OnMainMenuCommandPlay() {
+		setPanel(new GamePanel("level1.game"));
+		repaint();
+	}
+	@Override
+	public void OnMainMenuCommandExit() {
+		System.exit(0); 
+	}
+	
+	private PanelBase currentPanel = null;
+	private Font applicationFont = null;
 	private static final long serialVersionUID = 1L;
 
+	private void setPanel(PanelBase panel) {
+		if (currentPanel != null) {
+			removeKeyListener(currentPanel.keyListener());
+			remove(currentPanel);
+		}
+		currentPanel = panel;
+		currentPanel.setFont(applicationFont);
+		addKeyListener(currentPanel.keyListener());
+		add(currentPanel);
+	}
 }

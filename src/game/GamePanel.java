@@ -16,8 +16,6 @@
 
 package game;
 
-import utils.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -26,9 +24,13 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyListener;
 import java.util.List;
 
 import javax.swing.JPanel;
+
+import common.*;
+import utils.*;
 
 /**
  * The {@GamePanel} is a panel that is responsible for drawing the game board
@@ -37,7 +39,7 @@ import javax.swing.JPanel;
  *
  */
 
-public class GamePanel extends JPanel {
+public class GamePanel extends PanelBase {
 	public GamePanel(String levelId) {
 		game = new Game();
 		game.loadGame(levelId);
