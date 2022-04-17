@@ -49,6 +49,9 @@ final public class Game {
 	public List<Point> getBoxes() {
 		return boxes;
 	}
+	public List<Point> getTargetPoints() {
+		return targetPoints;
+	}
 	
 	public void loadGame(String gameId) {
 		String[] lines = loadGameData(gameId);
@@ -70,18 +73,30 @@ final public class Game {
 			for (int x = 0; x < maxLineLength; ++x) {
 				Cell cell = field.at(x, y);
 				final char ch = line.charAt(x); 
-				if (ch == 'E') {
-					cell.type = Cell.Type.NULL;					
-				} else if (ch == 'W') {
-					cell.type = Cell.Type.WALL;										
-				} else {
-					cell.type = Cell.Type.FLOOR;															
-				}
-				if (ch == 'M') {
-					moleLocation = new Point(x, y);
-				}
-				if (ch == 'B') {
-					boxes.add(new Point(x, y));
+				switch(ch) {
+					case 'E':
+						cell.type = Cell.Type.NULL;
+						break;
+					case 'W':
+						cell.type = Cell.Type.WALL;
+						break;
+					case 'F':
+						cell.type = Cell.Type.FLOOR;
+						break;
+					case 'M':
+						moleLocation = new Point(x, y);
+						cell.type = Cell.Type.FLOOR;
+						break;
+					case 'B':
+						boxes.add(new Point(x, y));
+						cell.type = Cell.Type.FLOOR;
+						break;
+					case 'T':
+						targetPoints.add(new Point(x, y));
+						cell.type = Cell.Type.FLOOR;
+						break;
+					default:
+						cell.type = Cell.Type.NULL;
 				}
 			}
 		}
@@ -151,6 +166,7 @@ final public class Game {
 	private Field field = null;
 	private Point moleLocation = new Point(-1, -1);
 	private List<Point> boxes = new ArrayList<Point>();
+	private List<Point> targetPoints = new ArrayList<Point>();
 	
 	
 	private String[] loadGameData(String resourceId) {
@@ -222,6 +238,10 @@ final public class Game {
 		// Can the mole move the box
 		Point newBoxLocation = new Point(newMoleLocation.x + offset.x, newMoleLocation.y + offset.y);
 		if (!floor.has(newBoxLocation)) {
+			return false;
+		}
+		PointSet boxSet = new PointSet(boxes);
+		if (boxSet.has(newBoxLocation)) {
 			return false;
 		}
 		

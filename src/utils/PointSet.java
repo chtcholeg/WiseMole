@@ -3,8 +3,18 @@ package utils;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class PointSet {
+	
+	public PointSet() {
+		
+	}
+	public PointSet(List<Point> pointList) {
+		for (Point point : pointList) {
+			add(point);
+		}
+	}
 	
 	public void add(Point point) {
 		HashSet<Integer> set = pointSet.get(point.x);

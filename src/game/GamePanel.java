@@ -26,6 +26,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -89,7 +90,7 @@ public class GamePanel extends PanelBase implements KeyListener {
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		graphics2d.setRenderingHints(renderingHints);
 
-		// Background
+		// -- Background
 		final Dimension fieldSize = game.getFieldSize();
 		final Dimension cellSize = new Dimension(workingRect.width / fieldSize.width, workingRect.height / fieldSize.height);
 		for (int rowIndex = 0; rowIndex < fieldSize.height; ++rowIndex) {
@@ -99,15 +100,29 @@ public class GamePanel extends PanelBase implements KeyListener {
 			}
 		}
 		
-		// Foreground
+		// -- Foreground
 		Point molePosition = game.getMolePosition();
+		List<Point> boxes = new ArrayList<Point>(game.getBoxes());
+		List<Point> targetPoints = new ArrayList<Point>(game.getTargetPoints());
+		List<Point> activeBoxes = extractActiveBoxes(boxes, targetPoints);
+		// Mole
 		Rectangle cellRect = calcCellRect(workingRect, cellSize, molePosition.x, molePosition.y);
 		drawImage(graphics2d, cellRect, "mole.png");
-		List<Point> boxes = game.getBoxes();
+		// Active boxes
+		for (Point activeBox : activeBoxes) {
+			cellRect = calcCellRect(workingRect, cellSize, activeBox.x, activeBox.y);
+			drawImage(graphics2d, cellRect, "box_active.png");			
+		}
+		// Inactive boxes
 		for (Point box : boxes) {
 			cellRect = calcCellRect(workingRect, cellSize, box.x, box.y);
 			drawImage(graphics2d, cellRect, "box_inactive.png");			
 		}
+		// Target points
+		for (Point targetPoint : targetPoints) {
+			cellRect = calcCellRect(workingRect, cellSize, targetPoint.x, targetPoint.y);
+			drawImage(graphics2d, cellRect, "target_point.png");			
+		}		
 	}
 	
 	private void drawCell(Graphics2D graphics, Rectangle cellRect, Cell cell) {
@@ -168,6 +183,34 @@ public class GamePanel extends PanelBase implements KeyListener {
 		rect.y += dy;
 		rect.width -= 2 * dx;
 		rect.height -= 2 * dy;
+	}
+	static private List<Point> extractActiveBoxes(List<Point> boxes, List<Point> targetPoints) {
+		List<Point> activeBoxes = new ArrayList<>();
+		PointSet boxSet = new PointSet(boxes);
+		PointSet targetPointSet = new PointSet(targetPoints);
+		List<Point> newBoxes = new ArrayList<Point>();
+		List<Point> newTargetPoints = new ArrayList<Point>();
+		// 1. Active boxes + new box list
+		for (Point box : boxes) {
+			if (targetPointSet.has(box)) {
+				activeBoxes.add(box);
+			} else {
+				newBoxes.add(box);
+			}
+		}
+		// 2. Remove target points
+		for (Point targetPoint : targetPoints) {
+			if (!boxSet.has(targetPoint)) {
+				newTargetPoints.add(targetPoint);
+			}
+		}
+		// 3. Update data
+		boxes.clear();
+		boxes.addAll(newBoxes);
+		targetPoints.clear();
+		targetPoints.addAll(newTargetPoints);
+		
+		return activeBoxes;
 	}
 
 	private final int padding = 10;
