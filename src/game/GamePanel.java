@@ -24,6 +24,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import utils.*;
  *
  */
 
-public class GamePanel extends PanelBase {
+public class GamePanel extends PanelBase implements KeyListener {
 	public GamePanel(String levelId) {
 		game = new Game();
 		game.loadGame(levelId);
@@ -56,6 +57,29 @@ public class GamePanel extends PanelBase {
 			}
 		}
 	}
+	
+	@Override
+	public KeyListener keyListener() { return this; }
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	@Override
+	public void keyPressed(KeyEvent e) {
+		final int keyCode = e.getKeyCode();
+		boolean haveChanges = false;
+		switch (keyCode) { 
+			case KeyEvent.VK_UP: haveChanges = game.tryToMoveMole(Game.MoleMovementDirection.UP); break;
+			case KeyEvent.VK_DOWN: haveChanges = game.tryToMoveMole(Game.MoleMovementDirection.DOWN); break;
+			case KeyEvent.VK_LEFT: haveChanges = game.tryToMoveMole(Game.MoleMovementDirection.LEFT); break;
+			case KeyEvent.VK_RIGHT: haveChanges = game.tryToMoveMole(Game.MoleMovementDirection.RIGHT); break;
+		}
+		if (haveChanges) {
+			revalidate();
+			repaint();
+		}
+
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {}
 
 	private void drawField(Graphics graphics, Rectangle workingRect) {
 		RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,

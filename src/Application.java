@@ -72,7 +72,6 @@ public class Application extends JFrame implements MainMenuPanel.Callback {
 	@Override
 	public void OnMainMenuCommandPlay() {
 		setPanel(new GamePanel("level1.game"));
-		repaint();
 	}
 	@Override
 	public void OnMainMenuCommandExit() {
@@ -92,5 +91,7 @@ public class Application extends JFrame implements MainMenuPanel.Callback {
 		currentPanel.setFont(applicationFont);
 		addKeyListener(currentPanel.keyListener());
 		add(currentPanel);
+		currentPanel.revalidate();
+		currentPanel.repaint();
 	}
 }

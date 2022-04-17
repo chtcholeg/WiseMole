@@ -17,6 +17,9 @@
 package game;
 
 import java.awt.Dimension;
+import java.awt.Point;
+
+import utils.*;
 
 /**
  * The {@Field} is a logical game field that contains persistent (static) objects
@@ -44,6 +47,20 @@ public class Field {
 	}
 	public Cell at(int x, int y) {
 		return cells[y][x];
+	}
+	
+	public PointSet getCellCoordinatesByType(Cell.Type type) {
+		PointSet set = new PointSet();
+		for (int y = 0 ; y < cells.length; ++y) {
+			final Cell[] row = cells[y];
+			for (int x = 0; x < row.length; ++x) {
+				final Cell cell = row[x];
+				if (cell.type == type) {
+					set.add(new Point(x, y));
+				}
+			}
+		}
+		return set;
 	}
 	
 	

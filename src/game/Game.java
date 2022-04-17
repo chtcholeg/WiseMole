@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.PointSet;
+
 /**
  * The {@Game} class is logical representation of the game.
  * 
@@ -33,6 +35,8 @@ import java.util.List;
  */
 
 final public class Game {
+	public enum MoleMovementDirection {UP, DOWN, LEFT, RIGHT}
+	
 	public Dimension getFieldSize() {
 		return (field == null) ? new Dimension(0, 0) : field.getSize();
 	}
@@ -81,6 +85,14 @@ final public class Game {
 				}
 			}
 		}
+	}
+	
+	public boolean tryToMoveMole(MoleMovementDirection direction) {
+		if (!canMoveMole(direction)) {
+			return false;
+		}
+		moveMole(direction);
+		return true;
 	}
 	
 	public void createDefGame() {
@@ -136,6 +148,11 @@ final public class Game {
 		moleLocation = new Point(2, 2);
 	}
 	
+	private Field field = null;
+	private Point moleLocation = new Point(-1, -1);
+	private List<Point> boxes = new ArrayList<Point>();
+	
+	
 	private String[] loadGameData(String resourceId) {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		try (InputStream input = classLoader.getResourceAsStream("game/" + resourceId)) {
@@ -167,7 +184,65 @@ final public class Game {
 		return result;
 	}
 	
-	private Field field = null;
-	private Point moleLocation = new Point(-1, -1);
-	private List<Point> boxes = new ArrayList<Point>();
+	static Point convertDirectionToPoint(MoleMovementDirection direction) {
+		switch(direction) {
+			case UP: return new Point(0, -1);
+			case DOWN: return new Point(0, 1);
+			case LEFT: return new Point(-1, 0);
+			case RIGHT: return new Point(1, 0);
+		}
+		return null;
+	}
+	private boolean canMoveMole(MoleMovementDirection direction) {
+		PointSet floor = field.getCellCoordinatesByType(Cell.Type.FLOOR);
+		Point offset = convertDirectionToPoint(direction);
+		if (offset == null) {
+			return false;
+		}
+		
+		// Check floor cell
+		Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
+		if (!floor.has(newMoleLocation)) {
+			return false;
+		}
+		
+		// Do we have a box on this cell?
+		boolean hasBox = false;
+		for (int index = 0; index < boxes.size(); ++index) {
+			Point box = boxes.get(index);
+			if (box.equals(newMoleLocation)) {
+				hasBox = true;
+				break;
+			}
+		}
+		if (!hasBox) {
+			return true;
+		}
+		
+		// Can the mole move the box
+		Point newBoxLocation = new Point(newMoleLocation.x + offset.x, newMoleLocation.y + offset.y);
+		if (!floor.has(newBoxLocation)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private void moveMole(MoleMovementDirection direction) {
+		if (!canMoveMole(direction)) {
+			return;
+		}
+		Point offset = convertDirectionToPoint(direction);
+		Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
+		
+		for (int index = 0; index < boxes.size(); ++index) {
+			Point box = boxes.get(index);
+			if (box.equals(newMoleLocation)) {
+				box.translate(offset.x, offset.y);
+				break;
+			}
+		}
+
+		moleLocation = newMoleLocation;
+	}
 }
