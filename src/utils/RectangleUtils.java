@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+package utils;
 
-package common;
-
-import java.awt.event.KeyListener;
-
-import javax.swing.JPanel;
+import java.awt.Rectangle;
 
 /**
- * The {@PanelBase} is base class for panels used in the application.
+ * The {@RectangleUtils} is a bunch of useful functions
+ *
  * @author olegshchepilov
  *
  */
-
-public class PanelBase extends JPanel {
-	// If a child class wants to process key events, it has to return non-null object
-	public KeyListener keyListener() { return null; }
-
-	private static final long serialVersionUID = 1L;
+public class RectangleUtils {
+	static public void deflateRect(Rectangle rect, int dx, int dy) {
+		deflateRect(rect, dx, dy, dx, dy);
+	}
+	
+	static public void deflateRect(Rectangle rect, int left, int top, int right, int bottom) {
+		rect.x += left;
+		rect.y += top;
+		rect.width -= (left + right);
+		rect.height -= (top + bottom);
+	}
 }

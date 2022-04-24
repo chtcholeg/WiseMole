@@ -24,6 +24,9 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,10 +43,12 @@ import utils.*;
 
 public class MainMenuPanel extends PanelBase implements KeyListener {
 	public interface Callback {
-		public void OnMainMenuCommandPlay();
-		public void OnMainMenuCommandExit();
+		public void onMainMenuCommandPlay(boolean continuePrevGame);
+		public void onMainMenuCommandEdit();
+		public void onMainMenuCommandExit();
 	}
-	public MainMenuPanel(Callback mainMenuCallback) {
+	public MainMenuPanel(Callback mainMenuCallback, boolean hasClosedGame) {
+		showContinueItem = hasClosedGame;
 		callback = mainMenuCallback;
 	}
 
@@ -57,7 +62,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 		switch (keyCode) { 
 			case KeyEvent.VK_UP: moveSelection(true); break;
 			case KeyEvent.VK_DOWN: moveSelection(false); break;
-			case KeyEvent.VK_ENTER: commandSelection(); break; 
+			case KeyEvent.VK_ENTER: commandSelection(); break;
+			case KeyEvent.VK_ESCAPE: if (callback != null) callback.onMainMenuCommandExit(); break;
 		}
 	}
 	@Override
@@ -80,7 +86,7 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 		    final ItemBlock block = renderedContent.itemBlocks.get(itemIndex);
 			final boolean selected = (selectedItemIndex == itemIndex);
 			graphics.setColor(selected ? Color.RED : Color.BLACK);
-			graphics.drawString(block.string, offsetX + block.area.x, offsetY + block.area.y);
+			graphics.drawString(block.string, offsetX + block.area.x, offsetY + block.area.y + block.area.height);
 			
 			if (selected) {
 				Image image = ImageStorage.getImage("arrow.png");
@@ -90,7 +96,7 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 					final int targetArrowHeight = block.area.height;
 					final int targetArrowWidth = orignalArrowWidth * targetArrowHeight / originalArrowHeight;
 					final int arrowX = offsetX - targetArrowWidth;
-					final int arrowY = offsetY + block.area.y - block.area.height + (block.area.height - targetArrowHeight) / 2;
+					final int arrowY = offsetY + block.area.y;
 					graphics.drawImage(image, arrowX, arrowY, targetArrowWidth, targetArrowHeight, null);
 				}
 			}
@@ -99,6 +105,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 	
 	private enum ItemType {
 		PLAY,
+		CONTINUE,
+		EDIT,
 		EXIT,
 		UNKNOWN
 	}
@@ -114,25 +122,31 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 	}
 	private RenderedContent renderedContent = new RenderedContent();
 	private int selectedItemIndex = 0;
+	private boolean showContinueItem = false;
 	private Callback callback = null;
 	private static final long serialVersionUID = 1L;
 	
 	
 	private static String convertTypeToString(ItemType type) {
 		switch(type) {
-			case PLAY: return "Play";
-			case EXIT: return "Exit";
+			case PLAY: return Lang.get(Lang.Res.PLAY);
+			case CONTINUE: return Lang.get(Lang.Res.CONTINUE);
+			case EDIT: return Lang.get(Lang.Res.EDIT);
+			case EXIT: return Lang.get(Lang.Res.EXIT);
 			case UNKNOWN: return "<Unknown>";
+			default: return "";
 		}
-		return "";
 	}
 	
 	private void renderContent(Graphics graphics) {
-		final List<ItemType> items = Arrays.asList(ItemType.PLAY, ItemType.EXIT);
+		final List<ItemType> items = showContinueItem 
+				? Arrays.asList(ItemType.PLAY, ItemType.CONTINUE, ItemType.EDIT, ItemType.EXIT)
+				: Arrays.asList(ItemType.PLAY, ItemType.EDIT, ItemType.EXIT);
 		final int itemOffset = 10;
 		renderedContent.menuTotalSize = new Dimension(0, 0);
 		FontMetrics fontMetrics = graphics.getFontMetrics();
-		final int fontHeight = fontMetrics.getHeight()/2;
+		final int fontHeight = FontUtils.getFontHeight(fontMetrics);
+	
 		for (ItemType itemType : items) {
 			ItemBlock block = new ItemBlock();
 			block.type = itemType;
@@ -160,8 +174,12 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 		if (callback != null && selectedItemIndex >=0 && selectedItemIndex < renderedContent.itemBlocks.size()) {
 			final ItemBlock block = renderedContent.itemBlocks.get(selectedItemIndex);
 			switch(block.type) {
-				case PLAY: callback.OnMainMenuCommandPlay(); break;
-				case EXIT: callback.OnMainMenuCommandExit(); break;
+				case PLAY: callback.onMainMenuCommandPlay(false); break;
+				case CONTINUE: callback.onMainMenuCommandPlay(true); break;
+				case EDIT: callback.onMainMenuCommandEdit(); break;
+				case EXIT: callback.onMainMenuCommandExit(); break;
+			default:
+				break;
 			}
 		}
 	}

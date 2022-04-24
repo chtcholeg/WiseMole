@@ -16,19 +16,32 @@
 
 package common;
 
-import java.awt.event.KeyListener;
-
-import javax.swing.JPanel;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 /**
- * The {@PanelBase} is base class for panels used in the application.
+ * The {@ControlBase} is base class for controls.
  * @author olegshchepilov
  *
  */
-
-public class PanelBase extends JPanel {
-	// If a child class wants to process key events, it has to return non-null object
-	public KeyListener keyListener() { return null; }
-
-	private static final long serialVersionUID = 1L;
+public class ControlBase {
+	public ControlBase() {
+	}
+	
+	public int getIdealHeight() {
+		return 0;
+	}
+	public int getIdealWidth() {
+		return 0;
+	}
+	public void setPosition(Rectangle rect) {
+		position = rect;
+		onPositionChanged();
+	}
+	public void paint(Graphics graphics) {
+	}
+	
+	protected void onPositionChanged() {}
+	
+	protected Rectangle position = null;
 }

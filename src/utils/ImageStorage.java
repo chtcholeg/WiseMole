@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 /**
- * The {ImageStorage} is a storage of images that are used in the application
+ * The {@ImageStorage} is a storage of images that are used in the application
  *
  * @author olegshchepilov
  *

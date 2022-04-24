@@ -16,19 +16,28 @@
 
 package common;
 
-import java.awt.event.KeyListener;
-
-import javax.swing.JPanel;
-
 /**
- * The {@PanelBase} is base class for panels used in the application.
+ * The {@SpaceControl} is class presents empty space.
  * @author olegshchepilov
  *
  */
 
-public class PanelBase extends JPanel {
-	// If a child class wants to process key events, it has to return non-null object
-	public KeyListener keyListener() { return null; }
 
-	private static final long serialVersionUID = 1L;
+public class SpaceControl extends ControlBase {
+	public SpaceControl(int controlWidth, int controlHeight) {
+		width = controlWidth;
+		height = controlHeight;
+	}
+	
+	@Override
+	public int getIdealHeight() {
+		return height;
+	}
+	@Override
+	public int getIdealWidth() {
+		return width;
+	}
+	
+	private int width = 0;	
+	private int height = 0;
 }

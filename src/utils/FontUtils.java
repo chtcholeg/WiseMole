@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package common;
+package utils;
 
-import java.awt.event.KeyListener;
-
-import javax.swing.JPanel;
+import java.awt.FontMetrics;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 /**
- * The {@PanelBase} is base class for panels used in the application.
+ * The {@ImageStorage} is a set of font/text utils
+ *
  * @author olegshchepilov
  *
  */
 
-public class PanelBase extends JPanel {
-	// If a child class wants to process key events, it has to return non-null object
-	public KeyListener keyListener() { return null; }
 
-	private static final long serialVersionUID = 1L;
+public class FontUtils {
+
+	public static int getFontHeight(FontMetrics metrics) {
+		final int originalFontHeight = metrics.getHeight();
+		FontRenderContext context = metrics.getFontRenderContext();
+		AffineTransform transform = context.getTransform();
+		return (int)((double) originalFontHeight / transform.getScaleY());
+	}
+	
 }

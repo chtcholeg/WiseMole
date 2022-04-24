@@ -18,14 +18,13 @@
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import common.*;
+import editor.*;
 import game.*;
 import menu.*;
 
@@ -38,7 +37,7 @@ import menu.*;
  *
  */
 
-public class Application extends JFrame implements MainMenuPanel.Callback {
+public class Application extends JFrame implements MainMenuPanel.Callback, GamePanel.Callback, EditorPanel.Callback {
 	public static void main(String[] args) {
 		Application app = new Application();
 		app.setVisible(true);
@@ -47,7 +46,7 @@ public class Application extends JFrame implements MainMenuPanel.Callback {
 	public Application() {
 		initFont();
 		
-		setPanel(new MainMenuPanel(this));
+		setPanel(new MainMenuPanel(this, closedGame != null));
 
         setSize(ApplicationDefines.FRAME_WIDTH, ApplicationDefines.FRAME_HEIGHT);
 
@@ -70,16 +69,29 @@ public class Application extends JFrame implements MainMenuPanel.Callback {
 	
 	// MainMenuPanel.Callback
 	@Override
-	public void OnMainMenuCommandPlay() {
-		setPanel(new GamePanel("level1.game"));
+	public void onMainMenuCommandPlay(boolean continueClosedGame) {
+		GamePanel gamePanel = continueClosedGame ? new GamePanel(closedGame, this) : new GamePanel(currentGameId, this);
+		setPanel(gamePanel);
 	}
 	@Override
-	public void OnMainMenuCommandExit() {
+	public void onMainMenuCommandEdit() {
+		setPanel(new EditorPanel(this));
+	}
+	@Override
+	public void onMainMenuCommandExit() {
 		System.exit(0); 
+	}
+	// GamePanel.Callback
+	@Override
+	public void onGamePanelCommandExit(Game currentGame) {
+		closedGame = currentGame;
+		setPanel(new MainMenuPanel(this, closedGame != null));
 	}
 	
 	private PanelBase currentPanel = null;
 	private Font applicationFont = null;
+	private String currentGameId = "level1.game"; 
+	private Game closedGame = null;
 	private static final long serialVersionUID = 1L;
 
 	private void setPanel(PanelBase panel) {
@@ -94,4 +106,10 @@ public class Application extends JFrame implements MainMenuPanel.Callback {
 		currentPanel.revalidate();
 		currentPanel.repaint();
 	}
+	// EditorPanel.Callback
+	@Override
+	public void onEditorPanelCommandExit(Game game) {
+		setPanel(new MainMenuPanel(this, closedGame != null));
+	}
+
 }

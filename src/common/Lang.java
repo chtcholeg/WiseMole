@@ -16,19 +16,31 @@
 
 package common;
 
-import java.awt.event.KeyListener;
-
-import javax.swing.JPanel;
-
 /**
- * The {@PanelBase} is base class for panels used in the application.
+ * The {@Lang} is class to get localized text resources.
  * @author olegshchepilov
  *
  */
 
-public class PanelBase extends JPanel {
-	// If a child class wants to process key events, it has to return non-null object
-	public KeyListener keyListener() { return null; }
-
-	private static final long serialVersionUID = 1L;
+public class Lang {
+	public enum Res {
+		PLAY,
+		EDIT,
+		CONTINUE,
+		EXIT,
+		WIDTH,
+		HEIGHT
+	}
+	
+	static public String get(Res res) {
+		switch(res) {
+			case PLAY: 			return "Play";
+			case EDIT: 			return "Edit";
+			case CONTINUE: 		return "Continue";
+			case EXIT: 			return "Exit";
+			case WIDTH: 		return "Width";
+			case HEIGHT: 		return "Height";
+			default:			return "<Unknown>";
+		}
+	}
 }

@@ -35,81 +35,98 @@ import utils.PointSet;
  */
 
 final public class Game {
-	public enum MoleMovementDirection {UP, DOWN, LEFT, RIGHT}
-	
+	public enum MoleMovementDirection {
+		UP, DOWN, LEFT, RIGHT
+	}
+	public final static int MAX_FIELD_WIDTH = 40;
+	public final static int MAX_FIELD_HEIGHT = 40;
+
+	public Game() {
+	}
+
 	public Dimension getFieldSize() {
 		return (field == null) ? new Dimension(0, 0) : field.getSize();
 	}
+	public void setFieldSize(Dimension newSize) {
+		if (field == null) {
+			field = new Field();
+		}
+		field.setSize(newSize);
+	}
+
 	public Cell getCell(int columnIndex, int rowIndex) {
 		return (field == null) ? null : field.at(columnIndex, rowIndex);
 	}
+
 	public Point getMolePosition() {
 		return (moleLocation == null) ? new Point(-1, -1) : moleLocation;
 	}
+
 	public List<Point> getBoxes() {
 		return boxes;
 	}
+
 	public List<Point> getTargetPoints() {
 		return targetPoints;
 	}
-	
+
 	public void loadGame(String gameId) {
 		String[] lines = loadGameData(gameId);
 		if (lines == null || lines.length == 0) {
 			return;
 		}
-		
+
 		final int maxLineLength = findMaxLineLength(lines);
 		for (int i = 0; i < lines.length; ++i) {
 			if (lines[i].length() < maxLineLength) {
 				lines[i] += String.valueOf('E').repeat(maxLineLength - lines[i].length());
 			}
 		}
-		
+
 		field = new Field();
 		field.setSize(maxLineLength, lines.length);
 		for (int y = 0; y < lines.length; ++y) {
 			String line = lines[y];
 			for (int x = 0; x < maxLineLength; ++x) {
 				Cell cell = field.at(x, y);
-				final char ch = line.charAt(x); 
-				switch(ch) {
-					case 'E':
-						cell.type = Cell.Type.NULL;
-						break;
-					case 'W':
-						cell.type = Cell.Type.WALL;
-						break;
-					case 'F':
-						cell.type = Cell.Type.FLOOR;
-						break;
-					case 'M':
-						moleLocation = new Point(x, y);
-						cell.type = Cell.Type.FLOOR;
-						break;
-					case 'B':
-						boxes.add(new Point(x, y));
-						cell.type = Cell.Type.FLOOR;
-						break;
-					case 'T':
-						targetPoints.add(new Point(x, y));
-						cell.type = Cell.Type.FLOOR;
-						break;
-					default:
-						cell.type = Cell.Type.NULL;
+				final char ch = line.charAt(x);
+				switch (ch) {
+				case 'E':
+					cell.type = Cell.Type.NULL;
+					break;
+				case 'W':
+					cell.type = Cell.Type.WALL;
+					break;
+				case 'F':
+					cell.type = Cell.Type.FLOOR;
+					break;
+				case 'M':
+					moleLocation = new Point(x, y);
+					cell.type = Cell.Type.FLOOR;
+					break;
+				case 'B':
+					boxes.add(new Point(x, y));
+					cell.type = Cell.Type.FLOOR;
+					break;
+				case 'T':
+					targetPoints.add(new Point(x, y));
+					cell.type = Cell.Type.FLOOR;
+					break;
+				default:
+					cell.type = Cell.Type.NULL;
 				}
 			}
 		}
 	}
-	
-	public boolean tryToMoveMole(MoleMovementDirection direction) {
+
+	protected boolean tryToMoveMole(MoleMovementDirection direction) {
 		if (!canMoveMole(direction)) {
 			return false;
 		}
 		moveMole(direction);
 		return true;
 	}
-	
+
 	public void createDefGame() {
 		field = new Field();
 		field.setSize(7, 6);
@@ -120,7 +137,7 @@ final public class Game {
 		field.at(4, 0).type = Cell.Type.WALL;
 		field.at(5, 0).type = Cell.Type.WALL;
 		field.at(6, 0).type = Cell.Type.WALL;
-		
+
 		field.at(0, 1).type = Cell.Type.WALL;
 		field.at(1, 1).type = Cell.Type.FLOOR;
 		field.at(2, 1).type = Cell.Type.FLOOR;
@@ -159,69 +176,73 @@ final public class Game {
 		field.at(3, 5).type = Cell.Type.WALL;
 		field.at(4, 5).type = Cell.Type.WALL;
 		field.at(5, 5).type = Cell.Type.WALL;
-		
+
 		moleLocation = new Point(2, 2);
 	}
-	
+
 	private Field field = null;
 	private Point moleLocation = new Point(-1, -1);
 	private List<Point> boxes = new ArrayList<Point>();
 	private List<Point> targetPoints = new ArrayList<Point>();
-	
-	
+
 	private String[] loadGameData(String resourceId) {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		try (InputStream input = classLoader.getResourceAsStream("game/" + resourceId)) {
-	        if (input == null) {
-	        	return null;
-	        }
-	        List<String> lineList = new ArrayList<String>();
-	        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	            	lineList.add(line);
-	            }
-	    		String[] result = new String[lineList.size()];
-	    		lineList.toArray(result);
-	    		return result;
-	        } catch (IOException exception) {
-		    }
-	    } catch (IOException exception) {
-	    }
-		
+			if (input == null) {
+				return null;
+			}
+			List<String> lineList = new ArrayList<String>();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					lineList.add(line);
+				}
+				String[] result = new String[lineList.size()];
+				lineList.toArray(result);
+				return result;
+			} catch (IOException exception) {
+			}
+		} catch (IOException exception) {
+		}
+
 		return null;
 	}
-	
+
 	private int findMaxLineLength(String[] lines) {
 		int result = 0;
-		for(String line : lines) {
+		for (String line : lines) {
 			result = Math.max(result, line.length());
 		}
 		return result;
 	}
-	
+
 	static Point convertDirectionToPoint(MoleMovementDirection direction) {
-		switch(direction) {
-			case UP: return new Point(0, -1);
-			case DOWN: return new Point(0, 1);
-			case LEFT: return new Point(-1, 0);
-			case RIGHT: return new Point(1, 0);
+		switch (direction) {
+		case UP:
+			return new Point(0, -1);
+		case DOWN:
+			return new Point(0, 1);
+		case LEFT:
+			return new Point(-1, 0);
+		case RIGHT:
+			return new Point(1, 0);
 		}
 		return null;
 	}
+
 	private boolean canMoveMole(MoleMovementDirection direction) {
 		PointSet floor = field.getCellCoordinatesByType(Cell.Type.FLOOR);
 		Point offset = convertDirectionToPoint(direction);
 		if (offset == null) {
 			return false;
 		}
-		
+
 		// Check floor cell
 		Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
 		if (!floor.has(newMoleLocation)) {
 			return false;
 		}
-		
+
 		// Do we have a box on this cell?
 		boolean hasBox = false;
 		for (int index = 0; index < boxes.size(); ++index) {
@@ -234,7 +255,7 @@ final public class Game {
 		if (!hasBox) {
 			return true;
 		}
-		
+
 		// Can the mole move the box
 		Point newBoxLocation = new Point(newMoleLocation.x + offset.x, newMoleLocation.y + offset.y);
 		if (!floor.has(newBoxLocation)) {
@@ -244,17 +265,17 @@ final public class Game {
 		if (boxSet.has(newBoxLocation)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private void moveMole(MoleMovementDirection direction) {
 		if (!canMoveMole(direction)) {
 			return;
 		}
 		Point offset = convertDirectionToPoint(direction);
 		Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
-		
+
 		for (int index = 0; index < boxes.size(); ++index) {
 			Point box = boxes.get(index);
 			if (box.equals(newMoleLocation)) {
