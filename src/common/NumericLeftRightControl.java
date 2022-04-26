@@ -16,8 +16,10 @@
 
 package common;
 
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 import utils.*;
@@ -52,6 +54,19 @@ public class NumericLeftRightControl extends ControlBase {
 		Rectangle labelPosition = (Rectangle) position.clone();
 		RectangleUtils.deflateRect(labelPosition, LEFT_RIGHT_PADDING, TOP_BOTTOM_PADDING); 
 		label.setPosition(labelPosition);
+	}
+	@Override
+	public int onMouseMove(Point mousePt) {
+		if ( (mousePt.y < 0) || (mousePt.y > position.height) ) {
+			return Cursor.DEFAULT_CURSOR;
+		}
+		if ( (mousePt.x < 0) || (mousePt.x > position.width) ) {
+			return Cursor.DEFAULT_CURSOR;
+		}
+		if ( mousePt.x < LEFT_RIGHT_PADDING || (mousePt.x > (position.width - LEFT_RIGHT_PADDING)) ) {
+			return Cursor.HAND_CURSOR;
+		}
+		return Cursor.DEFAULT_CURSOR;
 	}
 	@Override
 	public void paint(Graphics graphics) {

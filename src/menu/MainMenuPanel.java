@@ -17,16 +17,18 @@
 package menu;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +43,7 @@ import utils.*;
  *
  */
 
-public class MainMenuPanel extends PanelBase implements KeyListener {
+public class MainMenuPanel extends PanelBase implements KeyListener, MouseListener, MouseMotionListener {
 	public interface Callback {
 		public void onMainMenuCommandPlay(boolean continuePrevGame);
 		public void onMainMenuCommandEdit();
@@ -54,6 +56,10 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 
 	@Override
 	public KeyListener keyListener() { return this;  }
+	@Override
+	public MouseListener mouseListener() { return this; }
+	@Override
+	public MouseMotionListener mouseMotionListener() { return this; }
 	@Override
 	public void keyTyped(KeyEvent e) { }
 	@Override
@@ -68,7 +74,35 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {}
-	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		final int index = getIndexOfItemUnderPoint(PanelUtils.getRelativePoint(e, this));
+		if (index != -1) {
+			selectedItemIndex = index;
+			commandSelection();
+		}
+	}
+	@Override
+    public void mousePressed(MouseEvent e) {}
+	@Override
+    public void mouseReleased(MouseEvent e) {}
+	@Override
+    public void mouseEntered(MouseEvent e) {}
+	@Override
+    public void mouseExited(MouseEvent e) {}
+	@Override
+    public void mouseDragged(MouseEvent e) {}
+	@Override
+    public void mouseMoved(MouseEvent e) {
+		final int index = getIndexOfItemUnderPoint(PanelUtils.getRelativePoint(e, this));
+		if (index == -1) {
+			setCursor(Cursor.DEFAULT_CURSOR);
+		} else {
+			selectedItemIndex = index;
+			setCursor(Cursor.HAND_CURSOR);
+			repaint();			
+		}
+	}
 	
 	@Override
 	public void paintComponent(Graphics graphics) {
@@ -78,15 +112,14 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 			renderContent(graphics);
 		}
 		
-		final Dimension currentPanelTotalSize = getSize();		
-		final int offsetX = (currentPanelTotalSize.width - renderedContent.menuTotalSize.width) / 2;
-		final int offsetY = (currentPanelTotalSize.height - renderedContent.menuTotalSize.height) / 2;
+		final Dimension currentPanelTotalSize = getSize();
+		final Point offset = calcContentOffset();
 		
 		for (int itemIndex = 0; itemIndex < renderedContent.itemBlocks.size(); ++itemIndex) {
 		    final ItemBlock block = renderedContent.itemBlocks.get(itemIndex);
 			final boolean selected = (selectedItemIndex == itemIndex);
 			graphics.setColor(selected ? Color.RED : Color.BLACK);
-			graphics.drawString(block.string, offsetX + block.area.x, offsetY + block.area.y + block.area.height);
+			graphics.drawString(block.string, offset.x + block.area.x, offset.y + block.area.y + block.area.height);
 			
 			if (selected) {
 				Image image = ImageStorage.getImage("arrow.png");
@@ -95,8 +128,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 					final int originalArrowHeight = image.getHeight(null);
 					final int targetArrowHeight = block.area.height;
 					final int targetArrowWidth = orignalArrowWidth * targetArrowHeight / originalArrowHeight;
-					final int arrowX = offsetX - targetArrowWidth;
-					final int arrowY = offsetY + block.area.y;
+					final int arrowX = offset.x - targetArrowWidth;
+					final int arrowY = offset.y + block.area.y;
 					graphics.drawImage(image, arrowX, arrowY, targetArrowWidth, targetArrowHeight, null);
 				}
 			}
@@ -183,5 +216,32 @@ public class MainMenuPanel extends PanelBase implements KeyListener {
 			}
 		}
 	}
+	
+	private Point calcContentOffset() {
+		final Dimension currentPanelTotalSize = getSize();
+		if (renderedContent.menuTotalSize == null) {
+			return new Point(0, 0);
+		}
+		return new Point(
+				(currentPanelTotalSize.width - renderedContent.menuTotalSize.width) / 2, 
+				(currentPanelTotalSize.height - renderedContent.menuTotalSize.height) / 2);
+	}
+	
+	private int getIndexOfItemUnderPoint(Point point) {
+		final Point offset = calcContentOffset();
+		
+		for (int index = 0; index < renderedContent.itemBlocks.size(); ++index) {
+			final ItemBlock block = renderedContent.itemBlocks.get(index);
+			Rectangle rect = (Rectangle) block.area.clone();
+			rect.translate(offset.x, offset.y);
+			if (rect.contains(point)) {
+				return index;
+			}
+		}
+		return -1;
+	}
 
+	private void setCursor(int cursorId) {
+		setCursor(new Cursor(cursorId));
+	}
 }

@@ -37,7 +37,14 @@ import menu.*;
  *
  */
 
-public class Application extends JFrame implements MainMenuPanel.Callback, GamePanel.Callback, EditorPanel.Callback {
+public class Application 
+	extends 
+		JFrame 
+	implements 
+		MainMenuPanel.Callback, 
+		GamePanel.Callback, 
+		EditorPanel.Callback 
+{
 	public static void main(String[] args) {
 		Application app = new Application();
 		app.setVisible(true);
@@ -97,11 +104,15 @@ public class Application extends JFrame implements MainMenuPanel.Callback, GameP
 	private void setPanel(PanelBase panel) {
 		if (currentPanel != null) {
 			removeKeyListener(currentPanel.keyListener());
+			removeMouseListener(currentPanel.mouseListener());
+			removeMouseMotionListener(currentPanel.mouseMotionListener());
 			remove(currentPanel);
 		}
 		currentPanel = panel;
 		currentPanel.setFont(applicationFont);
 		addKeyListener(currentPanel.keyListener());
+		addMouseListener(currentPanel.mouseListener());
+		addMouseMotionListener(currentPanel.mouseMotionListener());
 		add(currentPanel);
 		currentPanel.revalidate();
 		currentPanel.repaint();

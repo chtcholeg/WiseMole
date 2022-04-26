@@ -18,13 +18,18 @@ package editor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,7 +45,7 @@ import utils.*;
  *
  */
 
-public class EditorPanel extends GamePanelBase {
+public class EditorPanel extends GamePanelBase implements MouseListener, MouseMotionListener {
 	public interface Callback {
 		public void onEditorPanelCommandExit(Game game);
 	}
@@ -87,6 +92,37 @@ public class EditorPanel extends GamePanelBase {
 		updateControlsPostions();
 	}
 
+	@Override
+	public MouseListener mouseListener() { return this; }
+	@Override
+	public MouseMotionListener mouseMotionListener() { return this; }
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {}
+	@Override
+    public void mousePressed(MouseEvent e) {}
+	@Override
+    public void mouseReleased(MouseEvent e) {}
+	@Override
+    public void mouseEntered(MouseEvent e) {}
+	@Override
+    public void mouseExited(MouseEvent e) {}
+	@Override
+    public void mouseDragged(MouseEvent e) {}
+	@Override
+    public void mouseMoved(MouseEvent e) {
+		Point mousePos = PanelUtils.getRelativePoint(e, this);
+		final int index = getIndexOfControlUnderPoint(mousePos);
+		if (index == -1) {
+			setCursor(Cursor.DEFAULT_CURSOR);
+		} else {
+			ControlBase control = controls.get(index);
+			final Rectangle position = control.getPosition();
+			mousePos.translate(-position.x, -position.y);
+			setCursor(control.onMouseMove(mousePos));
+		}
+	}
+	
 	@Override
 	public void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
@@ -163,6 +199,21 @@ public class EditorPanel extends GamePanelBase {
 		
 		revalidate();
 		repaint();
+	}
+	
+	private int getIndexOfControlUnderPoint(Point point) {
+		for (int index = 0; index < controls.size(); ++index) {
+			final ControlBase control = controls.get(index);
+			final Rectangle rect = control.getPosition();
+			if (rect.contains(point)) {
+				return index;
+			}
+		}
+		return -1;
+	}
+	
+	private void setCursor(int cursorId) {
+		setCursor(new Cursor(cursorId));
 	}
 
 	private Game game = null;

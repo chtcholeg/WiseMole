@@ -14,38 +14,25 @@
  * limitations under the License.
  */
 
-package common;
+package utils;
 
-import java.awt.Cursor;
-import java.awt.Graphics;
+import java.awt.Component;
 import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+
+import javax.swing.SwingUtilities;
 
 /**
- * The {@ControlBase} is base class for controls.
+ * The {@PanelUtils} is a bunch of useful functions
+ *
  * @author olegshchepilov
  *
  */
-public class ControlBase {
-	public ControlBase() {
+
+public class PanelUtils {
+	public static Point getRelativePoint(MouseEvent e, Component component) {
+		Point point = e.getLocationOnScreen();
+		SwingUtilities.convertPointFromScreen(point, component);
+		return point;
 	}
-	
-	public int getIdealHeight() {
-		return 0;
-	}
-	public int getIdealWidth() {
-		return 0;
-	}
-	public void setPosition(Rectangle rect) {
-		position = rect;
-		onPositionChanged();
-	}
-	public Rectangle getPosition() {
-		return position == null ? null : (Rectangle)position.clone();
-	}
-	public void paint(Graphics graphics) {}
-	public int onMouseMove(Point mousePoistion) { return Cursor.DEFAULT_CURSOR; }
-	protected void onPositionChanged() {}
-	
-	protected Rectangle position = null;
 }

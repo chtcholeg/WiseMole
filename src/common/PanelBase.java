@@ -17,6 +17,8 @@
 package common;
 
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JPanel;
 
@@ -29,6 +31,10 @@ import javax.swing.JPanel;
 public class PanelBase extends JPanel {
 	// If a child class wants to process key events, it has to return non-null object
 	public KeyListener keyListener() { return null; }
+	// If a child class wants to process mouse events, it has to return non-null object
+	public MouseListener mouseListener() { return null; }
+	// If a child class wants to process mouse motion, it has to return non-null object
+	public MouseMotionListener mouseMotionListener() { return null; }
 
 	private static final long serialVersionUID = 1L;
 }
