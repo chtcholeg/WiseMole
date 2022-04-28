@@ -19,7 +19,6 @@ package utils;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
 /**
  * The {@ImageStorage} is a set of font/text utils

@@ -112,7 +112,6 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
 			renderContent(graphics);
 		}
 		
-		final Dimension currentPanelTotalSize = getSize();
 		final Point offset = calcContentOffset();
 		
 		for (int itemIndex = 0; itemIndex < renderedContent.itemBlocks.size(); ++itemIndex) {

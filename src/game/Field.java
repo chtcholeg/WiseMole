@@ -35,10 +35,16 @@ public class Field {
 		setSize(size.width, size.height);
 	}
 	public void setSize(int width, int height) {
+		final Cell[][] prevCells = cells;
+		final Dimension prevSize = getSize(); 
 		cells = new Cell[height][width];
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				cells[y][x] = new Cell();
+				if ((prevCells != null) && (x < prevSize.width) && (y < prevSize.height)) { 
+					cells[y][x] = prevCells[y][x];					
+				} else {
+					cells[y][x] = new Cell();					
+				}
 			}
 		}
 	}

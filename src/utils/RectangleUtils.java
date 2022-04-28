@@ -34,4 +34,8 @@ public class RectangleUtils {
 		rect.width -= (left + right);
 		rect.height -= (top + bottom);
 	}
+	
+	static public void deflateRect(Rectangle rect, Margins margins) {
+		deflateRect(rect, margins.getLeft(), margins.getTop(), margins.getRight(), margins.getBottom());
+	}
 }

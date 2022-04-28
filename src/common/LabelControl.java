@@ -18,30 +18,32 @@ package common;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Rectangle;
 
 import utils.*;
 
 /**
- * The {@LabelControl} is class for painting and processing numeric-control.
+ * The {@LabelControl} is class for painting text control.
  * @author olegshchepilov
  *
  */
 
 public class LabelControl extends ControlBase {
+	final public static String TYPE = "Label";
+
 	public enum Alignment {
 		LEFT,
 		CENTER
 	}
 	public LabelControl(String labelText, Alignment alignment) {
+		super(TYPE, "");
 		setText(labelText);
 		setAlignment(alignment);
 	}
 	public LabelControl(String labelText) {
-		setText(labelText);
+		this(labelText, Alignment.LEFT);
 	}
 	public LabelControl() {
+		this("");
 	}
 	
 	void setText(String labelText) {

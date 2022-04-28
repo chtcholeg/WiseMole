@@ -20,16 +20,35 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@ControlBase} is base class for controls.
  * @author olegshchepilov
  *
  */
-public class ControlBase {
-	public ControlBase() {
+public abstract class ControlBase {
+	public ControlBase(String controlType, String controlId) {
+		type = controlType;
+		id = controlId;
 	}
 	
+	public interface ClickListener {
+		public void onControlClick(ControlBase control);
+	}
+	public void addClickListener(ClickListener listener) {
+		if (listener != null) {
+			clickListeners.add(listener);			
+		}
+	}
+
+	public String getType() {
+		return type;
+	}
+	public String getId() {
+		return id;
+	}
 	public int getIdealHeight() {
 		return 0;
 	}
@@ -45,7 +64,24 @@ public class ControlBase {
 	}
 	public void paint(Graphics graphics) {}
 	public int onMouseMove(Point mousePoistion) { return Cursor.DEFAULT_CURSOR; }
+	public void onMouseClick(Point mousePoistion) {
+		if (position == null || mousePoistion == null) {
+			return;
+		}
+		if ((mousePoistion.x < 0) || (mousePoistion.x > position.width)) {
+			return;
+		}
+		if ((mousePoistion.y < 0) || (mousePoistion.y > position.height)) {
+			return;
+		}
+		for (ClickListener listener : clickListeners) {
+			listener.onControlClick(this);
+		}
+	}
 	protected void onPositionChanged() {}
 	
+	private String type = null;
+	private String id = "";
+	private List<ClickListener> clickListeners = new ArrayList<ClickListener>();
 	protected Rectangle position = null;
 }

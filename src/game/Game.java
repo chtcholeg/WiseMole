@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.ControlBase;
+import common.ControlBase.ClickListener;
 import utils.PointSet;
 
 /**
@@ -41,17 +43,34 @@ final public class Game {
 	public final static int MAX_FIELD_WIDTH = 40;
 	public final static int MAX_FIELD_HEIGHT = 40;
 
+	
 	public Game() {
+	}
+	
+	public interface SizeListener {
+		public void onGameSizeChanged();
+	}
+	public void addSizeListener(SizeListener listener) {
+		if (listener != null) {
+			sizeListeners.add(listener);			
+		}
 	}
 
 	public Dimension getFieldSize() {
 		return (field == null) ? new Dimension(0, 0) : field.getSize();
 	}
 	public void setFieldSize(Dimension newSize) {
+		final Dimension prevSize = (field == null) ? null : field.getSize();
 		if (field == null) {
 			field = new Field();
 		}
 		field.setSize(newSize);
+		if (prevSize == null || !prevSize.equals(field.getSize())) {
+			for (SizeListener listener : sizeListeners) {
+				listener.onGameSizeChanged();
+			}
+			
+		}
 	}
 
 	public Cell getCell(int columnIndex, int rowIndex) {
@@ -59,15 +78,24 @@ final public class Game {
 	}
 
 	public Point getMolePosition() {
-		return (moleLocation == null) ? new Point(-1, -1) : moleLocation;
+		return moleLocation;
+	}
+	public void setMolePosition(Point point) {
+		moleLocation = point;
 	}
 
 	public List<Point> getBoxes() {
 		return boxes;
 	}
+	public void setBoxPoint(Point point, boolean enable) {
+		setItem(boxes, point, enable);
+	}
 
 	public List<Point> getTargetPoints() {
 		return targetPoints;
+	}
+	public void setTargetPoint(Point point, boolean enable) {
+		setItem(targetPoints, point, enable);
 	}
 
 	public void loadGame(String gameId) {
@@ -184,6 +212,7 @@ final public class Game {
 	private Point moleLocation = new Point(-1, -1);
 	private List<Point> boxes = new ArrayList<Point>();
 	private List<Point> targetPoints = new ArrayList<Point>();
+	private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
 
 	private String[] loadGameData(String resourceId) {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -285,5 +314,17 @@ final public class Game {
 		}
 
 		moleLocation = newMoleLocation;
+	}
+	
+	private static void setItem(List<Point> points, Point point, boolean enable) {
+		final boolean contained = points.contains(point);
+		if (contained == enable) {
+			return;
+		}
+		if (enable) {
+			points.add(point);
+		} else {
+			points.remove(point);		
+		}	
 	}
 }

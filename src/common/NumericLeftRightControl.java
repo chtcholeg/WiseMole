@@ -31,10 +31,26 @@ import utils.*;
  */
 
 public class NumericLeftRightControl extends ControlBase {
-	public NumericLeftRightControl(int min, int max) {
+	final public static String TYPE = "NumericLeftRight";
+
+	public interface Callback {
+		public void onNumericControlValueChanged(String controlId, int value);
+	}
+	private enum Part {
+		LEFT_BUTTON,
+		RIGHT_BUTTON,
+		SPACE
+	}
+	public NumericLeftRightControl(int min, int max, int initValue) {
+		this(min, max, initValue, "", null);
+	}
+	public NumericLeftRightControl(int min, int max, int initValue, String controlId, Callback controlCallback) {
+		super(TYPE, controlId);
 		minValue = min;
 		maxValue = max;
-		setValue(Math.min(maxValue, Math.max(value, minValue)));
+		setValue(initValue);
+		label.setText(Integer.toString(value));			
+		callback = controlCallback;
 	}
 	
 	public static int getImageWidth() {
@@ -57,16 +73,20 @@ public class NumericLeftRightControl extends ControlBase {
 	}
 	@Override
 	public int onMouseMove(Point mousePt) {
-		if ( (mousePt.y < 0) || (mousePt.y > position.height) ) {
-			return Cursor.DEFAULT_CURSOR;
+		return (calcControlPart(mousePt) == Part.SPACE) ? Cursor.DEFAULT_CURSOR : Cursor.HAND_CURSOR;
+	}
+	@Override
+	public void onMouseClick(Point mousePt) {
+		switch(calcControlPart(mousePt)) {
+			case LEFT_BUTTON: 
+				setValue(value - 1); 
+				break;
+			case RIGHT_BUTTON: 
+				setValue(value + 1); 
+				break;
+			default:
+				break;
 		}
-		if ( (mousePt.x < 0) || (mousePt.x > position.width) ) {
-			return Cursor.DEFAULT_CURSOR;
-		}
-		if ( mousePt.x < LEFT_RIGHT_PADDING || (mousePt.x > (position.width - LEFT_RIGHT_PADDING)) ) {
-			return Cursor.HAND_CURSOR;
-		}
-		return Cursor.DEFAULT_CURSOR;
 	}
 	@Override
 	public void paint(Graphics graphics) {
@@ -80,10 +100,33 @@ public class NumericLeftRightControl extends ControlBase {
 	}
 	
 	private void setValue(int newValue) {
-		value = newValue;
-		label.setText(Integer.toString(value));
+		newValue = Math.min(maxValue, Math.max(newValue, minValue));
+		if (value != newValue) {
+			value = newValue;
+			label.setText(Integer.toString(value));	
+			if (callback != null) {
+				callback.onNumericControlValueChanged(getId(), value);
+			}
+		}
 	}
 	
+	private Part calcControlPart(Point mousePt) {
+		if ( (mousePt.y < 0) || (mousePt.y > position.height) ) {
+			return Part.SPACE;
+		}
+		if ( (mousePt.x < 0) || (mousePt.x > position.width) ) {
+			return Part.SPACE;
+		}
+		if (mousePt.x < LEFT_RIGHT_PADDING) {
+			return Part.LEFT_BUTTON;
+		}
+		if (mousePt.x > (position.width - LEFT_RIGHT_PADDING)) {
+			return Part.RIGHT_BUTTON;			
+		}
+		return Part.SPACE;
+	}
+	
+	private Callback callback = null;
 	private int value = 0;
 	private int minValue = 0;
 	private int maxValue = 100;

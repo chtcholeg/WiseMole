@@ -24,5 +24,5 @@ package common;
 public class ApplicationDefines {
 	static public final float FONT_SIZE = 20f;
 	static public final int FRAME_WIDTH = 800;
-	static public final int FRAME_HEIGHT = 600;
+	static public final int FRAME_HEIGHT = 700;
 }

@@ -45,44 +45,26 @@ import utils.*;
  *
  */
 
-public class EditorPanel extends GamePanelBase implements MouseListener, MouseMotionListener {
+public class EditorPanel 
+		extends 
+			GamePanelBase 
+		implements 
+			MouseListener, 
+			MouseMotionListener,
+			NumericLeftRightControl.Callback,
+			ControlBase.ClickListener
+{
 	public interface Callback {
 		public void onEditorPanelCommandExit(Game game);
 	}
 
-	public class ComponentListenerImpl implements ComponentListener {
-		public ComponentListenerImpl(EditorPanel panel) {
-			parentPanel = panel;
-		}
-
-		@Override
-		public void componentResized(ComponentEvent componentEvent) {
-			parentPanel.onResize();
-		}
-
-		@Override
-		public void componentMoved(ComponentEvent e) {
-		}
-
-		@Override
-		public void componentShown(ComponentEvent e) {
-		}
-
-		@Override
-		public void componentHidden(ComponentEvent e) {
-		}
-
-		EditorPanel parentPanel = null;
-	}
-
 	public EditorPanel(Callback editorPanelCallback) {
 		toolPanelWidth = NumericLeftRightControl.getImageWidth() + 2 * PADDING;
+		setMargins(new Margins(toolPanelWidth, 0, 0, 0));
 		callback = editorPanelCallback;
 
-		game = new Game();
-
-		game.setFieldSize(new Dimension(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
-		addComponentListener(new ComponentListenerImpl(this));
+		setGame(new Game());
+		getGame().setFieldSize(new Dimension(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
 
 		initControls();
 		updateControlsPostions();
@@ -90,6 +72,7 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 
 	public void onResize() {
 		updateControlsPostions();
+		super.onResize();
 	}
 
 	@Override
@@ -100,7 +83,21 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 	@Override
 	public void mouseClicked(MouseEvent e) {}
 	@Override
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+		Point mousePos = PanelUtils.getRelativePoint(e, this);
+		final int index = getIndexOfControlUnderPoint(mousePos);
+		if (index == -1) {
+			final Point coordinates = findCellUnderPoint((Point)mousePos.clone());
+			if (coordinates != null) {
+				applySelectedCell(coordinates, selectedFieldType);
+			}
+		} else {
+			ControlBase control = controls.get(index);
+			final Rectangle position = control.getPosition();
+			mousePos.translate(-position.x, -position.y);
+			control.onMouseClick(mousePos);
+		}		
+	}
 	@Override
     public void mouseReleased(MouseEvent e) {}
 	@Override
@@ -127,30 +124,60 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 	public void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
 
-		if (game != null) {
+		if (getGame() != null) {
 			drawToolPanel(graphics);
-
-			final Rectangle gameWorkingRect = calcWorkingGameRect(game, toolPanelWidth, 0, 0, 0);
-			if (gameWorkingRect != null) {
-				drawField(graphics, game, gameWorkingRect);
-				drawFieldGrid(graphics, game, gameWorkingRect);
-			}
+			drawField(graphics);
+			drawFieldGrid(graphics);
 		}
 	}
+	
+	@Override
+	public void onNumericControlValueChanged(String controlId, int value) {
+		Dimension fieldSize = (Dimension) getGame().getFieldSize().clone();
+		if (controlId == HEIGHT_CONTROL_ID) {
+			fieldSize.height = value;
+		} else if (controlId == WIDTH_CONTROL_ID) {
+			fieldSize.width = value;
+		}
+		getGame().setFieldSize(fieldSize);
+		repaint();
+	}
+	@Override
+	public void onControlClick(ControlBase control) {
+		if (control.getType() == ImageControl.TYPE) {
+			switch(control.getId()) {
+				case MOLE_CONTROL_ID: selectedFieldType = FieldType.MOLE; break;
+				case BOX_ACTIVE_CONTROL_ID: selectedFieldType = FieldType.BOX_ACTIVE; break;
+				case BOX_INACTIVE_CONTROL_ID: selectedFieldType = FieldType.BOX_INACTIVE; break;
+				case TARGET_POINT_CONTROL_ID: selectedFieldType = FieldType.TARGET_POINT; break;
+				case WALL_CONTROL_ID: selectedFieldType = FieldType.WALL; break;
+				case FLOOR_CONTROL_ID: selectedFieldType = FieldType.FLOOR; break;
+				default:
+					selectedFieldType = FieldType.NULL;
+			}
+						
+			List<ControlBase> imageControls = getControlsByType(ImageControl.TYPE);
+			for (ControlBase imageControl : imageControls) {
+				((ImageControl) imageControl).setSelection(imageControl.getId() == control.getId());
+			}
+		}
+		repaint();
+	}
 
-	private void drawFieldGrid(Graphics graphics, Game game, Rectangle workingRect) {
-		final Dimension fieldSize = game.getFieldSize();
-		final Dimension cellSize = calcCellSize(fieldSize, workingRect);
+	private void drawFieldGrid(Graphics graphics) {
+		renderIfRequired();
+		final Dimension fieldSize = getGame().getFieldSize();
+		final Dimension cellSize = renderDetails.cellSize;
 
-		int y = workingRect.y;
+		int y = renderDetails.fieldArea.y;
 		for (int rowIndex = 0; rowIndex <= fieldSize.height; ++rowIndex) {
-			drawDashedLine(graphics, workingRect.x, y, workingRect.x + workingRect.width, y);
+			drawDashedLine(graphics, renderDetails.fieldArea.x, y, renderDetails.fieldArea.x + renderDetails.fieldArea.width, y);
 			y += cellSize.height;
 		}
 
-		int x = workingRect.x;
+		int x = renderDetails.fieldArea.x;
 		for (int columnIndex = 0; columnIndex <= fieldSize.width; ++columnIndex) {
-			drawDashedLine(graphics, x, workingRect.y, x, workingRect.y + workingRect.height);
+			drawDashedLine(graphics, x, renderDetails.fieldArea.y, x, renderDetails.fieldArea.y + renderDetails.fieldArea.height);
 			x += cellSize.width;
 		}
 	}
@@ -176,14 +203,38 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 	}
 
 	private void initControls() {
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("mole.png", MOLE_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("box_active.png", BOX_ACTIVE_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("box_inactive.png", BOX_INACTIVE_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("target_point.png", TARGET_POINT_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("wall.png", WALL_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
+		addClickableControl(new ImageControl("floor.png", FLOOR_CONTROL_ID, true));
+
+		controls.add(new SpaceControl(PADDING, PADDING));
 		controls.add(new LabelControl(Lang.get(Lang.Res.HEIGHT), LabelControl.Alignment.CENTER));
 		controls.add(new SpaceControl(PADDING, PADDING / 2));
-		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT));
+		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT, DEFAULT_FIELD_HEIGHT, HEIGHT_CONTROL_ID, this));
 		
 		controls.add(new SpaceControl(PADDING, PADDING));
 		controls.add(new LabelControl(Lang.get(Lang.Res.WIDTH), LabelControl.Alignment.CENTER));
 		controls.add(new SpaceControl(PADDING, PADDING / 2));
-		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_WIDTH));
+		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_WIDTH, DEFAULT_FIELD_WIDTH, WIDTH_CONTROL_ID, this));
+	}
+	
+	private void addClickableControl(ControlBase control) {
+		control.addClickListener(this);
+		controls.add(control);
 	}
 
 	private void updateControlsPostions() {
@@ -194,7 +245,7 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 		ListIterator<ControlBase> controlIterator = controls.listIterator(controls.size());
 		while (controlIterator.hasPrevious()) {
 			ControlBase control = (ControlBase) controlIterator.previous();
-			control.setPosition(placer.addBottom(control.getIdealHeight()));
+			control.setPosition(placer.addBottom(control.getIdealWidth(), control.getIdealHeight()));
 		}
 		
 		revalidate();
@@ -215,12 +266,86 @@ public class EditorPanel extends GamePanelBase implements MouseListener, MouseMo
 	private void setCursor(int cursorId) {
 		setCursor(new Cursor(cursorId));
 	}
+	private List<ControlBase> getControlsByType(String type) {
+		List<ControlBase> result = new ArrayList<ControlBase>();
+		for (ControlBase control : controls) {
+			if (control.getType() == type) {
+				result.add(control);
+			}
+		}
+		return result;
+	}
 
-	private Game game = null;
+	private void applySelectedCell(Point cellCoordinates, FieldType fieldType) {
+		Game game = getGame();
+		if (game == null || cellCoordinates == null) {
+			return;
+		}
+		Cell cell = game.getCell(cellCoordinates.x, cellCoordinates.y);
+		Point molePos = game.getMolePosition();
+		final boolean isMoleCell = (molePos != null) && cellCoordinates.equals(molePos);
+		Point newMolePosition = game.getMolePosition();
+		boolean addTargetPoint = false;
+		boolean addBox = false;
+		switch (fieldType) {
+			case MOLE:
+				cell.type = Cell.Type.FLOOR;
+				newMolePosition = cellCoordinates;
+				break;				
+			case BOX_ACTIVE:
+				cell.type = Cell.Type.FLOOR;
+				addTargetPoint = true;
+				addBox = true;
+				newMolePosition = isMoleCell ? null : newMolePosition;
+				break;
+			case BOX_INACTIVE:
+				cell.type = Cell.Type.FLOOR;
+				addBox = true;
+				newMolePosition = isMoleCell ? null : newMolePosition;
+				break;
+			case TARGET_POINT:
+				cell.type = Cell.Type.FLOOR;
+				addTargetPoint = true;
+				newMolePosition = isMoleCell ? null : newMolePosition;
+				break;
+			case WALL: 
+				cell.type = Cell.Type.WALL; 
+				newMolePosition = isMoleCell ? null : newMolePosition;
+				break;
+			case FLOOR: 
+				cell.type = Cell.Type.FLOOR; 
+				break;
+		}
+		game.setTargetPoint(cellCoordinates, addTargetPoint);
+		game.setBoxPoint(cellCoordinates, addBox);
+		game.setMolePosition(newMolePosition);
+		
+		repaint();
+	}
+	
+	private enum FieldType {
+		MOLE,
+		BOX_ACTIVE,
+		BOX_INACTIVE,
+		TARGET_POINT,
+		WALL,
+		FLOOR,
+		NULL
+	}
+	
 	private Callback callback = null;
 	private List<ControlBase> controls = new ArrayList<ControlBase>();
 	private int toolPanelWidth = 100;
+	private FieldType selectedFieldType = FieldType.NULL; 
 	private static final int DEFAULT_FIELD_WIDTH = 25;
 	private static final int DEFAULT_FIELD_HEIGHT = 15;
+	private static final String MOLE_CONTROL_ID = "MoleImageControlId";
+	private static final String BOX_ACTIVE_CONTROL_ID = "BoxActiveImageControlId";
+	private static final String BOX_INACTIVE_CONTROL_ID = "BoxInactiveImageControlId";
+	private static final String TARGET_POINT_CONTROL_ID = "TargetPointImageControlId";
+	private static final String WALL_CONTROL_ID = "WallImageControlId";
+	private static final String FLOOR_CONTROL_ID = "FloorImageControlId";
+	private static final String HEIGHT_CONTROL_ID = "HeightControlId";
+	private static final String WIDTH_CONTROL_ID = "WidthControlId";
 	private static final long serialVersionUID = 1L;
 }

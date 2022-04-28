@@ -24,7 +24,10 @@ package common;
 
 
 public class SpaceControl extends ControlBase {
+	final public static String TYPE = "Space";
+
 	public SpaceControl(int controlWidth, int controlHeight) {
+		super(TYPE, "");
 		width = controlWidth;
 		height = controlHeight;
 	}
