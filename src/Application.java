@@ -27,6 +27,7 @@ import common.*;
 import editor.*;
 import game.*;
 import menu.*;
+import utils.*;
 
 /**
  * The {@Application} class is main class of Application.
@@ -51,11 +52,14 @@ public class Application
 	}
 	
 	public Application() {
-		initFont();
+        this.setIconImage(ImageStorage.getImage("app_icon.png"));
+
+        initFont();
 		
 		setPanel(new MainMenuPanel(this, closedGame != null));
 
-        setSize(ApplicationDefines.FRAME_WIDTH, ApplicationDefines.FRAME_HEIGHT);
+        setSize(ApplicationDefines.DEFAULT_FRAME_SIZE);
+		setMinimumSize(ApplicationDefines.DEFAULT_FRAME_SIZE);
 
         setTitle("Wise Mole");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package common;
+package controls;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -42,7 +42,7 @@ public class ImageControl extends ControlBase {
 	public ImageControl(String resourceId, String controlId, boolean clickableValue) {
 		super(TYPE, controlId);
 		image = ImageStorage.getImage(resourceId);
-		clickable = clickableValue;
+		handCursor = clickableValue;
 	}
 	
 	public void setSelection(boolean value) {
@@ -75,10 +75,6 @@ public class ImageControl extends ControlBase {
 			graphics2d.drawLine(position.x, position.y + position.height, position.x, position.y);
 			graphics2d.dispose();
 		}
-	}
-	@Override
-	public int onMouseMove(Point mousePt) {
-		return clickable ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR;
 	}
 		
 	private Image image = null;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package common;
+package controls;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -132,6 +132,6 @@ public class NumericLeftRightControl extends ControlBase {
 	private int maxValue = 100;
 	private LabelControl label = new LabelControl("", LabelControl.Alignment.CENTER);
 	private static int LEFT_RIGHT_PADDING = 20;
-	private static int TOP_BOTTOM_PADDING = 4;	
+	private static int TOP_BOTTOM_PADDING = 4;
 	private static Image controlImage = ImageStorage.getImage("numeric_left_right.png");
 }

@@ -29,7 +29,8 @@ public class Lang {
 		CONTINUE,
 		EXIT,
 		WIDTH,
-		HEIGHT
+		HEIGHT,
+		SAVE
 	}
 	
 	static public String get(Res res) {
@@ -40,6 +41,7 @@ public class Lang {
 			case EXIT: 			return "Exit";
 			case WIDTH: 		return "Width";
 			case HEIGHT: 		return "Height";
+			case SAVE:			return "Save";
 			default:			return "<Unknown>";
 		}
 	}

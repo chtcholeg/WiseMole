@@ -15,6 +15,9 @@
  */
 
 package common;
+
+import java.awt.Dimension;
+
 /**
  * The {@ApplicationDefines} class that contains all main constants.
  * @author olegshchepilov
@@ -23,6 +26,5 @@ package common;
 
 public class ApplicationDefines {
 	static public final float FONT_SIZE = 20f;
-	static public final int FRAME_WIDTH = 800;
-	static public final int FRAME_HEIGHT = 700;
+	static public final Dimension DEFAULT_FRAME_SIZE = new Dimension(800, 800);
 }

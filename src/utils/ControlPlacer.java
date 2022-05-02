@@ -31,25 +31,29 @@ public class ControlPlacer {
 	}
 	
 	public Rectangle addBottom(int width, int height) {
-		Rectangle controlRect = (Rectangle) workingRect.clone();
-		final int bottom = workingRect.y + workingRect.height;
-		controlRect.y = bottom - height;
-		controlRect.height = height;
-		workingRect.height -= height; 
-		if (width > 0) {
-			controlRect.x += (workingRect.width - width) / 2;
-			controlRect.width = width;
-		}
-		return controlRect;
+		return add(width, height, false);
 	}
 	
 	public Rectangle addTop(int width, int height) {
+		return add(width, height, true);
+	}
+	
+	private Rectangle add(int width, int height, boolean top)
+	{
 		Rectangle controlRect = (Rectangle) workingRect.clone();
-		controlRect.height = height;
-		workingRect.y += height;
-		workingRect.height -= height;
+		if (top) {
+			controlRect.height = height;
+			workingRect.y += height;			
+		} else {
+			final int bottom = workingRect.y + workingRect.height;
+			controlRect.y = bottom - height;
+			controlRect.height = height;
+		}
+		
+		workingRect.height -= height; 
+		
 		if (width > 0) {
-			controlRect.x += (workingRect.width - controlRect.width) / 2;
+			controlRect.x += (workingRect.width - width) / 2;
 			controlRect.width = width;
 		}
 		return controlRect;

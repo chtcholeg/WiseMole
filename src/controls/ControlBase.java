@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package common;
+package controls;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -63,7 +63,10 @@ public abstract class ControlBase {
 		return position == null ? null : (Rectangle)position.clone();
 	}
 	public void paint(Graphics graphics) {}
-	public int onMouseMove(Point mousePoistion) { return Cursor.DEFAULT_CURSOR; }
+	public int onMouseMove(Point mousePoistion) 
+	{ 
+		return handCursor ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR; 
+	}
 	public void onMouseClick(Point mousePoistion) {
 		if (position == null || mousePoistion == null) {
 			return;
@@ -84,4 +87,5 @@ public abstract class ControlBase {
 	private String id = "";
 	private List<ClickListener> clickListeners = new ArrayList<ClickListener>();
 	protected Rectangle position = null;
+	protected boolean handCursor = false;
 }

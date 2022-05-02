@@ -25,8 +25,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -35,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import common.*;
+import controls.*;
 import game.*;
 import utils.*;
 
@@ -83,20 +82,9 @@ public class EditorPanel
 	@Override
 	public void mouseClicked(MouseEvent e) {}
 	@Override
-    public void mousePressed(MouseEvent e) {
-		Point mousePos = PanelUtils.getRelativePoint(e, this);
-		final int index = getIndexOfControlUnderPoint(mousePos);
-		if (index == -1) {
-			final Point coordinates = findCellUnderPoint((Point)mousePos.clone());
-			if (coordinates != null) {
-				applySelectedCell(coordinates, selectedFieldType);
-			}
-		} else {
-			ControlBase control = controls.get(index);
-			final Rectangle position = control.getPosition();
-			mousePos.translate(-position.x, -position.y);
-			control.onMouseClick(mousePos);
-		}		
+    public void mousePressed(MouseEvent e) 
+	{
+		processClick(e);
 	}
 	@Override
     public void mouseReleased(MouseEvent e) {}
@@ -105,7 +93,10 @@ public class EditorPanel
 	@Override
     public void mouseExited(MouseEvent e) {}
 	@Override
-    public void mouseDragged(MouseEvent e) {}
+    public void mouseDragged(MouseEvent e) 
+	{
+		processClick(e);
+	}
 	@Override
     public void mouseMoved(MouseEvent e) {
 		Point mousePos = PanelUtils.getRelativePoint(e, this);
@@ -113,7 +104,7 @@ public class EditorPanel
 		if (index == -1) {
 			setCursor(Cursor.DEFAULT_CURSOR);
 		} else {
-			ControlBase control = controls.get(index);
+			ControlBase control = controls.get(index).control;
 			final Rectangle position = control.getPosition();
 			mousePos.translate(-position.x, -position.y);
 			setCursor(control.onMouseMove(mousePos));
@@ -193,48 +184,81 @@ public class EditorPanel
 	}
 
 	private void drawToolPanel(Graphics graphics) {
-		for (ControlBase control : controls) {
-			control.paint(graphics);
+		for (ControlInfo controlInfo : controls) {
+			controlInfo.control.paint(graphics);
 		}
 	}
 
-	private Rectangle calcToolPanelRect() {
+	private Rectangle calcToolPanelRect() 
+	{
 		return new Rectangle(0, 0, toolPanelWidth, getSize().height);
 	}
 
-	private void initControls() {
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("mole.png", MOLE_CONTROL_ID, true));
+	private void initControls() 
+	{
+		addTopSpacer(PADDING);
+		addClickableTopImage("mole.png", MOLE_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("box_active.png", BOX_ACTIVE_CONTROL_ID, true));
+		addTopSpacer(PADDING);
+		addClickableTopImage("box_active.png", BOX_ACTIVE_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("box_inactive.png", BOX_INACTIVE_CONTROL_ID, true));
+		addTopSpacer(PADDING);
+		addClickableTopImage("box_inactive.png", BOX_INACTIVE_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("target_point.png", TARGET_POINT_CONTROL_ID, true));
+		addTopSpacer(PADDING);
+		addClickableTopImage("target_point.png", TARGET_POINT_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("wall.png", WALL_CONTROL_ID, true));
+		addTopSpacer(PADDING);
+		addClickableTopImage("wall.png", WALL_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		addClickableControl(new ImageControl("floor.png", FLOOR_CONTROL_ID, true));
+		addTopSpacer(PADDING);
+		addClickableTopImage("floor.png", FLOOR_CONTROL_ID);
 
-		controls.add(new SpaceControl(PADDING, PADDING));
-		controls.add(new LabelControl(Lang.get(Lang.Res.HEIGHT), LabelControl.Alignment.CENTER));
-		controls.add(new SpaceControl(PADDING, PADDING / 2));
-		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT, DEFAULT_FIELD_HEIGHT, HEIGHT_CONTROL_ID, this));
+		addTopSpacer(PADDING);
+		addTopLabel(Lang.Res.HEIGHT);
+		addTopSpacer(PADDING / 2);
+		addTopNumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT, DEFAULT_FIELD_HEIGHT, HEIGHT_CONTROL_ID);
 		
-		controls.add(new SpaceControl(PADDING, PADDING));
-		controls.add(new LabelControl(Lang.get(Lang.Res.WIDTH), LabelControl.Alignment.CENTER));
-		controls.add(new SpaceControl(PADDING, PADDING / 2));
-		controls.add(new NumericLeftRightControl(1, Game.MAX_FIELD_WIDTH, DEFAULT_FIELD_WIDTH, WIDTH_CONTROL_ID, this));
+		addTopSpacer(PADDING);
+		addTopLabel(Lang.Res.WIDTH);
+		addTopSpacer(PADDING / 2);
+		addTopNumericLeftRightControl(1, Game.MAX_FIELD_WIDTH, DEFAULT_FIELD_WIDTH, WIDTH_CONTROL_ID);
+
+		addBottomSpacer(PADDING);
+		addClickableBottomButton(Lang.Res.SAVE, SAVE_BUTTON_CONTROL_ID);
+		
+		addBottomSpacer(PADDING);
+		addClickableBottomButton(Lang.Res.EXIT, EXIT_BUTTON_CONTROL_ID);
 	}
 	
-	private void addClickableControl(ControlBase control) {
-		control.addClickListener(this);
-		controls.add(control);
+	private void addTopSpacer(int padding) 
+	{
+		controls.add(new ControlInfo(new SpaceControl(PADDING, padding), true));		
+	}
+	private void addBottomSpacer(int padding) 
+	{
+		controls.add(new ControlInfo(new SpaceControl(PADDING, padding), false));		
+	}
+	private void addClickableTopImage(String resourceId, String controlId)
+	{
+		addClickableControl(new ControlInfo(new ImageControl(resourceId, controlId, true), true));		
+	}
+	private void addTopLabel(Lang.Res stringId)
+	{
+		controls.add(new ControlInfo(new LabelControl(Lang.get(stringId), LabelControl.Alignment.CENTER), true));
+	}
+	private void addTopNumericLeftRightControl(int min, int max, int initValue, String controlId)
+	{
+		controls.add(new ControlInfo(new NumericLeftRightControl(min, max, initValue, controlId, this)));		
+	}
+	private void addClickableBottomButton(Lang.Res stringId, String controlId)
+	{
+		controls.add(new ControlInfo(new ButtonControl(Lang.get(stringId), controlId), false));		
+	}
+
+	private void addClickableControl(ControlInfo controlInfo) {
+		controlInfo.control.addClickListener(this);
+		controls.add(controlInfo);
 	}
 
 	private void updateControlsPostions() {
@@ -242,19 +266,29 @@ public class EditorPanel
 		RectangleUtils.deflateRect(toolPanelRect, PADDING, 2 * PADDING);
 		ControlPlacer placer = new ControlPlacer(toolPanelRect);
 
-		ListIterator<ControlBase> controlIterator = controls.listIterator(controls.size());
-		while (controlIterator.hasPrevious()) {
-			ControlBase control = (ControlBase) controlIterator.previous();
-			control.setPosition(placer.addBottom(control.getIdealWidth(), control.getIdealHeight()));
+		for (ControlInfo controlInfo : controls) {
+			ControlBase control = controlInfo.control;
+			if (controlInfo.placeToTop) {
+				control.setPosition(placer.addTop(control.getIdealWidth(), control.getIdealHeight()));							
+			}
 		}
 		
+		ListIterator<ControlInfo> controlIterator = controls.listIterator(controls.size());
+		while (controlIterator.hasPrevious()) {
+			ControlInfo controlInfo = (ControlInfo) controlIterator.previous();
+			if (!controlInfo.placeToTop) {
+				ControlBase control = controlInfo.control;
+				control.setPosition(placer.addBottom(control.getIdealWidth(), control.getIdealHeight()));				
+			}
+		}
+
 		revalidate();
 		repaint();
 	}
 	
 	private int getIndexOfControlUnderPoint(Point point) {
 		for (int index = 0; index < controls.size(); ++index) {
-			final ControlBase control = controls.get(index);
+			final ControlBase control = controls.get(index).control;
 			final Rectangle rect = control.getPosition();
 			if (rect.contains(point)) {
 				return index;
@@ -268,9 +302,9 @@ public class EditorPanel
 	}
 	private List<ControlBase> getControlsByType(String type) {
 		List<ControlBase> result = new ArrayList<ControlBase>();
-		for (ControlBase control : controls) {
-			if (control.getType() == type) {
-				result.add(control);
+		for (ControlInfo controlinfo : controls) {
+			if (controlinfo.control.getType() == type) {
+				result.add(controlinfo.control);
 			}
 		}
 		return result;
@@ -315,12 +349,33 @@ public class EditorPanel
 			case FLOOR: 
 				cell.type = Cell.Type.FLOOR; 
 				break;
+			case NULL:
+				cell.type = Cell.Type.NULL; 
+				newMolePosition = isMoleCell ? null : newMolePosition;
+				break;				
 		}
 		game.setTargetPoint(cellCoordinates, addTargetPoint);
 		game.setBoxPoint(cellCoordinates, addBox);
 		game.setMolePosition(newMolePosition);
 		
 		repaint();
+	}
+	
+	private void processClick(MouseEvent e) {
+		Point mousePos = PanelUtils.getRelativePoint(e, this);
+		final int index = getIndexOfControlUnderPoint(mousePos);
+		if (index == -1) {
+			final Point coordinates = findCellUnderPoint((Point)mousePos.clone());
+			if (coordinates != null) {
+				FieldType fieldType = (e.getButton() == MouseEvent.BUTTON1) ? selectedFieldType : FieldType.NULL;
+				applySelectedCell(coordinates, fieldType);
+			}
+		} else {
+			ControlBase control = controls.get(index).control;
+			final Rectangle position = control.getPosition();
+			mousePos.translate(-position.x, -position.y);
+			control.onMouseClick(mousePos);
+		}	
 	}
 	
 	private enum FieldType {
@@ -333,8 +388,23 @@ public class EditorPanel
 		NULL
 	}
 	
+	private class ControlInfo { 
+		public ControlBase control = null;
+		public boolean placeToTop = true;
+		
+		public ControlInfo(ControlBase control)
+		{
+			this(control, true);
+		}
+ 		public ControlInfo(ControlBase control, boolean top) 
+		{
+			this.control = control;
+			this.placeToTop = top;
+		}
+	}
+	
 	private Callback callback = null;
-	private List<ControlBase> controls = new ArrayList<ControlBase>();
+	private List<ControlInfo> controls = new ArrayList<ControlInfo>();
 	private int toolPanelWidth = 100;
 	private FieldType selectedFieldType = FieldType.NULL; 
 	private static final int DEFAULT_FIELD_WIDTH = 25;
@@ -347,5 +417,7 @@ public class EditorPanel
 	private static final String FLOOR_CONTROL_ID = "FloorImageControlId";
 	private static final String HEIGHT_CONTROL_ID = "HeightControlId";
 	private static final String WIDTH_CONTROL_ID = "WidthControlId";
+	private static final String SAVE_BUTTON_CONTROL_ID = "SaveButton";
+	private static final String EXIT_BUTTON_CONTROL_ID = "ExitButton";
 	private static final long serialVersionUID = 1L;
 }

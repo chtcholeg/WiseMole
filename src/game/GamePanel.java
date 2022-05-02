@@ -17,13 +17,9 @@
 package game;
 
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
-import utils.PanelUtils;
 
 /**
  * The {@GamePanel} is a panel that is responsible for drawing the game board

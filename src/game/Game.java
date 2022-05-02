@@ -25,8 +25,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.ControlBase;
-import common.ControlBase.ClickListener;
 import utils.PointSet;
 
 /**
@@ -69,8 +67,8 @@ final public class Game {
 			for (SizeListener listener : sizeListeners) {
 				listener.onGameSizeChanged();
 			}
-			
 		}
+		removeOutsideObject();
 	}
 
 	public Cell getCell(int columnIndex, int rowIndex) {
@@ -209,7 +207,7 @@ final public class Game {
 	}
 
 	private Field field = null;
-	private Point moleLocation = new Point(-1, -1);
+	private Point moleLocation = null;
 	private List<Point> boxes = new ArrayList<Point>();
 	private List<Point> targetPoints = new ArrayList<Point>();
 	private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
@@ -327,4 +325,23 @@ final public class Game {
 			points.remove(point);		
 		}	
 	}
+	
+	static boolean isOutside(Dimension fieldSize, Point point)
+	{
+		if (point == null) {
+			return false;
+		}
+		return (point.x >= fieldSize.width) || (point.y >= fieldSize.height);
+	}
+	 
+	private void removeOutsideObject()
+	{
+		final Dimension fieldSize = getFieldSize();
+		if (isOutside(fieldSize, moleLocation)) {
+			moleLocation = null;
+		}
+		boxes.removeIf(box -> isOutside(fieldSize, box));
+		targetPoints.removeIf(point -> isOutside(fieldSize, point));
+	}
+
 }
