@@ -28,18 +28,10 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import common.Lang;
 import controls.ButtonControl;
@@ -433,20 +425,7 @@ public class EditorPanel extends GamePanelBase
     }
 
     private void onSave() throws IOException {
-        JFileChooser fileChooser = new JFileChooser();
-        final String ext = "wmgame";
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Wise Mole file", ext));
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            final File file = fileChooser.getSelectedFile();
-            String absolutePath = file.getAbsolutePath();
-            if (!absolutePath.endsWith("." + ext)) {
-                absolutePath += "." + ext;
-            }
-            final Path filePath = Paths.get(absolutePath);
-            final byte[] data = getGame().getBinaryData();
-            Files.write(filePath, data, StandardOpenOption.CREATE);
-        }
+        LevelSaver.save(this, getGame());
     }
 
     private enum FieldType {

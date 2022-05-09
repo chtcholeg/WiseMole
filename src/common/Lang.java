@@ -25,7 +25,8 @@ package common;
 
 public class Lang {
     public enum Res {
-        PLAY, EDIT, CONTINUE, EXIT, WIDTH, HEIGHT, SAVE
+        PLAY, EDIT, CONTINUE, EXIT, WIDTH, HEIGHT, SAVE, DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT,
+        DIALOG_GAME_VALIDATION_TEXT, ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES
     }
 
     static public String get(Res res) {
@@ -44,6 +45,16 @@ public class Lang {
                 return "Height";
             case SAVE:
                 return "Save";
+            case DIALOG_OVERWRITE_CONFIRM_TITLE:
+                return "Confirm Save";
+            case DIALOG_OVERWRITE_CONFIRM_TEXT:
+                return "File already exists. Do you want to replace it?";
+            case DIALOG_GAME_VALIDATION_TEXT:
+                return "There is an issue: {0}. Do you want to save the level?";
+            case ERROR_THERE_IS_NO_MOLE:
+                return "there is no mole on the field";
+            case ERROR_TARGET_POINTS_MORE_THAN_BOXES:
+                return "target point count is more than box count";
             default:
                 return "<Unknown>";
         }
