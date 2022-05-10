@@ -425,7 +425,7 @@ public class EditorPanel extends GamePanelBase
     }
 
     private void onSave() throws IOException {
-        LevelSaver.save(this, getGame());
+        LevelStorage.save(this, getGame());
     }
 
     private enum FieldType {

@@ -25,8 +25,9 @@ package common;
 
 public class Lang {
     public enum Res {
-        PLAY, EDIT, CONTINUE, EXIT, WIDTH, HEIGHT, SAVE, DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT,
-        DIALOG_GAME_VALIDATION_TEXT, ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES
+        PLAY, EDIT, CONTINUE, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, DIALOG_OVERWRITE_CONFIRM_TITLE,
+        DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT, ERROR_THERE_IS_NO_MOLE,
+        ERROR_TARGET_POINTS_MORE_THAN_BOXES
     }
 
     static public String get(Res res) {
@@ -37,6 +38,8 @@ public class Lang {
                 return "Edit";
             case CONTINUE:
                 return "Continue";
+            case LOAD_FROM_FILE:
+                return "Load";
             case EXIT:
                 return "Exit";
             case WIDTH:

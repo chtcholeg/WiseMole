@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -33,13 +34,13 @@ import common.Lang;
 import game.Game;
 
 /**
- * The {@LevelSaver} is responsible for saving a level
+ * The {@LevelStorage} is responsible for saving a level
  *
  * @author olegshchepilov
  *
  */
 
-public class LevelSaver {
+public class LevelStorage {
     static public void save(Component dialogParent, Game game) throws IOException {
         final String issue = validateGame(game);
         if ((issue != null) && !issue.isEmpty()) {
@@ -63,6 +64,28 @@ public class LevelSaver {
 
         final byte[] data = game.getBinaryData();
         Files.write(filePath, data, StandardOpenOption.CREATE_NEW);
+    }
+
+    static public Game load(Component dialogParent) throws IOException {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Wise Mole file", gameExtension));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        if (fileChooser.showOpenDialog(dialogParent) != JFileChooser.APPROVE_OPTION) {
+            return null;
+        }
+
+        final File file = fileChooser.getSelectedFile();
+        if (file == null) {
+            return null;
+        }
+
+        List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
+        if (lines == null) {
+            return null;
+        }
+        Game game = new Game();
+        final boolean success = game.loadGame(lines);
+        return success ? game : null;
     }
 
     static private String validateGame(Game game) {

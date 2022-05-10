@@ -139,10 +139,9 @@ final public class Game {
         return CellDataByte.EMPTY_FLOOR.toByte();
     }
 
-    public void loadGame(String gameId) {
-        String[] lines = loadGameData(gameId);
+    public boolean loadGame(String[] lines) {
         if (lines == null || lines.length == 0) {
-            return;
+            return false;
         }
 
         final int maxLineLength = findMaxLineLength(lines);
@@ -191,6 +190,20 @@ final public class Game {
                 }
             }
         }
+        return true;
+    }
+
+    public boolean loadGame(List<String> lines) {
+        if (lines == null) {
+            return false;
+        }
+        String[] lineArray = new String[lines.size()];
+        lines.toArray(lineArray);
+        return loadGame(lineArray);
+    }
+
+    public boolean loadGame(String gameId) {
+        return loadGame(loadGameData(gameId));
     }
 
     protected boolean tryToMoveMole(MoleMovementDirection direction) {

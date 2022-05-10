@@ -50,6 +50,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
     public interface Callback {
         public void onMainMenuCommandPlay(boolean continuePrevGame);
 
+        public void onMainMenuCommandLoadFromFile();
+
         public void onMainMenuCommandEdit();
 
         public void onMainMenuCommandExit();
@@ -176,7 +178,7 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
     }
 
     private enum ItemType {
-        PLAY, CONTINUE, EDIT, EXIT, UNKNOWN
+        PLAY, CONTINUE, LOAD_FROM_FILE, EDIT, EXIT, UNKNOWN
     }
 
     private class ItemBlock {
@@ -203,6 +205,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
                 return Lang.get(Lang.Res.PLAY);
             case CONTINUE:
                 return Lang.get(Lang.Res.CONTINUE);
+            case LOAD_FROM_FILE:
+                return Lang.get(Lang.Res.LOAD_FROM_FILE);
             case EDIT:
                 return Lang.get(Lang.Res.EDIT);
             case EXIT:
@@ -216,8 +220,8 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
 
     private void renderContent(Graphics graphics) {
         final List<ItemType> items = showContinueItem
-                ? Arrays.asList(ItemType.PLAY, ItemType.CONTINUE, ItemType.EDIT, ItemType.EXIT)
-                : Arrays.asList(ItemType.PLAY, ItemType.EDIT, ItemType.EXIT);
+                ? Arrays.asList(ItemType.PLAY, ItemType.CONTINUE, ItemType.LOAD_FROM_FILE, ItemType.EDIT, ItemType.EXIT)
+                : Arrays.asList(ItemType.PLAY, ItemType.LOAD_FROM_FILE, ItemType.EDIT, ItemType.EXIT);
         final int itemOffset = 10;
         renderedContent.menuTotalSize = new Dimension(0, 0);
         FontMetrics fontMetrics = graphics.getFontMetrics();
@@ -255,6 +259,9 @@ public class MainMenuPanel extends PanelBase implements KeyListener, MouseListen
                     break;
                 case CONTINUE:
                     callback.onMainMenuCommandPlay(true);
+                    break;
+                case LOAD_FROM_FILE:
+                    callback.onMainMenuCommandLoadFromFile();
                     break;
                 case EDIT:
                     callback.onMainMenuCommandEdit();

@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 import common.ApplicationDefines;
 import common.PanelBase;
 import editor.EditorPanel;
+import editor.LevelStorage;
 import game.Game;
 import game.GamePanel;
 import menu.MainMenuPanel;
@@ -75,6 +76,19 @@ public class Application extends JFrame implements MainMenuPanel.Callback, GameP
     @Override
     public void onMainMenuCommandPlay(boolean continueClosedGame) {
         GamePanel gamePanel = continueClosedGame ? new GamePanel(closedGame, this) : new GamePanel(currentGameId, this);
+        setPanel(gamePanel);
+    }
+
+    @Override
+    public void onMainMenuCommandLoadFromFile() {
+        Game game = null;
+        try {
+            game = LevelStorage.load(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        GamePanel gamePanel = new GamePanel(game, this);
         setPanel(gamePanel);
     }
 
