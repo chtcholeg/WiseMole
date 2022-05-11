@@ -25,19 +25,21 @@ package common;
 
 public class Lang {
     public enum Res {
-        PLAY, EDIT, CONTINUE, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, DIALOG_OVERWRITE_CONFIRM_TITLE,
-        DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT, ERROR_THERE_IS_NO_MOLE,
-        ERROR_TARGET_POINTS_MORE_THAN_BOXES
+        PLAY, CREATE, CONTINUE, SELECT_PREDEFINED, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, GO_BACK,
+        DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT,
+        ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION
     }
 
     static public String get(Res res) {
         switch (res) {
             case PLAY:
                 return "Play";
-            case EDIT:
-                return "Edit";
+            case CREATE:
+                return "Create";
             case CONTINUE:
                 return "Continue";
+            case SELECT_PREDEFINED:
+                return "Select";
             case LOAD_FROM_FILE:
                 return "Load";
             case EXIT:
@@ -48,6 +50,8 @@ public class Lang {
                 return "Height";
             case SAVE:
                 return "Save";
+            case GO_BACK:
+                return "Go back";
             case DIALOG_OVERWRITE_CONFIRM_TITLE:
                 return "Confirm Save";
             case DIALOG_OVERWRITE_CONFIRM_TEXT:
@@ -58,6 +62,8 @@ public class Lang {
                 return "there is no mole on the field";
             case ERROR_TARGET_POINTS_MORE_THAN_BOXES:
                 return "target point count is more than box count";
+            case WISE_MOLE_LEVEL_FILE_DESCRIPTION:
+                return "Wise Mole level file";
             default:
                 return "<Unknown>";
         }

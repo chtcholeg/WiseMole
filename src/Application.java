@@ -28,6 +28,7 @@ import editor.EditorPanel;
 import editor.LevelStorage;
 import game.Game;
 import game.GamePanel;
+import menu.LevelMenuPanel;
 import menu.MainMenuPanel;
 import utils.ImageStorage;
 
@@ -39,7 +40,8 @@ import utils.ImageStorage;
  *
  */
 
-public class Application extends JFrame implements MainMenuPanel.Callback, GamePanel.Callback, EditorPanel.Callback {
+public class Application extends JFrame
+        implements MainMenuPanel.Callback, LevelMenuPanel.Callback, GamePanel.Callback, EditorPanel.Callback {
     public static void main(String[] args) {
         Application app = new Application();
         app.setVisible(true);
@@ -75,31 +77,48 @@ public class Application extends JFrame implements MainMenuPanel.Callback, GameP
     // MainMenuPanel.Callback
     @Override
     public void onMainMenuCommandPlay(boolean continueClosedGame) {
-        GamePanel gamePanel = continueClosedGame ? new GamePanel(closedGame, this) : new GamePanel(currentGameId, this);
-        setPanel(gamePanel);
+        Game gameToLoad = continueClosedGame ? closedGame : LevelStorage.loadPredefined(currentPredefinedLevelIndex);
+        setPanel(new GamePanel(gameToLoad, this));
+    }
+
+    @Override
+    public void onMainMenuCommandSelectPredefined() {
+        setPanel(new LevelMenuPanel(this));
     }
 
     @Override
     public void onMainMenuCommandLoadFromFile() {
-        Game game = null;
-        try {
-            game = LevelStorage.load(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
+        Game game = LevelStorage.loadFromFile(this);
+        if (game != null) {
+            setPanel(new GamePanel(game, this));
         }
-        GamePanel gamePanel = new GamePanel(game, this);
-        setPanel(gamePanel);
     }
 
     @Override
-    public void onMainMenuCommandEdit() {
+    public void onMainMenuCommandCreate() {
         setPanel(new EditorPanel(this));
     }
 
     @Override
     public void onMainMenuCommandExit() {
         System.exit(0);
+    }
+
+    // LevelMenuPanel.Callback
+    @Override
+    public void onLevelMenuCommandLevel(int index) {
+        Game game = LevelStorage.loadPredefined(index);
+        if (game != null) {
+            currentPredefinedLevelIndex = index;
+            setPanel(new GamePanel(game, this));
+        } else {
+            onLevelMenuCommandExit();
+        }
+    }
+
+    @Override
+    public void onLevelMenuCommandExit() {
+        setPanel(new MainMenuPanel(this, closedGame != null));
     }
 
     // GamePanel.Callback
@@ -111,7 +130,7 @@ public class Application extends JFrame implements MainMenuPanel.Callback, GameP
 
     private PanelBase currentPanel = null;
     private Font applicationFont = null;
-    private String currentGameId = "level1.game";
+    private int currentPredefinedLevelIndex = 1;
     private Game closedGame = null;
     private static final long serialVersionUID = 1L;
 

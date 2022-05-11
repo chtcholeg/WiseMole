@@ -17,13 +17,17 @@
 package editor;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
@@ -66,9 +70,10 @@ public class LevelStorage {
         Files.write(filePath, data, StandardOpenOption.CREATE_NEW);
     }
 
-    static public Game load(Component dialogParent) throws IOException {
+    static public Game loadFromFile(Component dialogParent) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Wise Mole file", gameExtension));
+        fileChooser.setFileFilter(
+                new FileNameExtensionFilter(Lang.get(Lang.Res.WISE_MOLE_LEVEL_FILE_DESCRIPTION), LEVEL_FILE_EXTENSION));
         fileChooser.setAcceptAllFileFilterUsed(false);
         if (fileChooser.showOpenDialog(dialogParent) != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -79,13 +84,50 @@ public class LevelStorage {
             return null;
         }
 
-        List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
-        if (lines == null) {
-            return null;
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(file.getAbsolutePath()));
+            if (lines == null) {
+                return null;
+            }
+            Game game = new Game();
+            if (game.loadGame(lines)) {
+                return game;
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
-        Game game = new Game();
-        final boolean success = game.loadGame(lines);
-        return success ? game : null;
+        return null;
+    }
+
+    public static boolean hasPredefined(int index) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return classLoader.getResource(getPredefinedResourceId(index)) != null;
+    }
+
+    static public Game loadPredefined(int index) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        try (InputStream input = classLoader.getResourceAsStream(getPredefinedResourceId(index))) {
+            if (input == null) {
+                return null;
+            }
+            List<String> lines = new ArrayList<String>();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines.add(line);
+                }
+                Game game = new Game();
+                if (game.loadGame(lines)) {
+                    return game;
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
     }
 
     static private String validateGame(Game game) {
@@ -101,7 +143,7 @@ public class LevelStorage {
 
     static private File getSelectedFile(Component dialogParent) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Wise Mole file", gameExtension));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Wise Mole file", LEVEL_FILE_EXTENSION));
         fileChooser.setAcceptAllFileFilterUsed(false);
         if (fileChooser.showSaveDialog(dialogParent) != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -112,8 +154,8 @@ public class LevelStorage {
 
     static private Path getApprovedPath(Component parentComponent, File file) throws IOException {
         String absolutePath = file.getAbsolutePath();
-        if (!absolutePath.endsWith("." + gameExtension)) {
-            absolutePath += "." + gameExtension;
+        if (!absolutePath.endsWith("." + LEVEL_FILE_EXTENSION)) {
+            absolutePath += "." + LEVEL_FILE_EXTENSION;
         }
         final Path filePath = Paths.get(absolutePath);
         if (Files.exists(filePath)) {
@@ -127,5 +169,9 @@ public class LevelStorage {
         return filePath;
     }
 
-    final static private String gameExtension = "wmgame";
+    private static String getPredefinedResourceId(Integer index) {
+        return "game/level" + index.toString() + "." + LEVEL_FILE_EXTENSION;
+    }
+
+    final static private String LEVEL_FILE_EXTENSION = "wmgame";
 }

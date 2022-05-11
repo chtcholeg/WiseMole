@@ -18,10 +18,6 @@ package game;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,10 +198,6 @@ final public class Game {
         return loadGame(lineArray);
     }
 
-    public boolean loadGame(String gameId) {
-        return loadGame(loadGameData(gameId));
-    }
-
     protected boolean tryToMoveMole(MoleMovementDirection direction) {
         if (!canMoveMole(direction)) {
             return false;
@@ -272,29 +264,6 @@ final public class Game {
     private List<Point> boxes = new ArrayList<Point>();
     private List<Point> targetPoints = new ArrayList<Point>();
     private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
-
-    private String[] loadGameData(String resourceId) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        try (InputStream input = classLoader.getResourceAsStream("game/" + resourceId)) {
-            if (input == null) {
-                return null;
-            }
-            List<String> lineList = new ArrayList<String>();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    lineList.add(line);
-                }
-                String[] result = new String[lineList.size()];
-                lineList.toArray(result);
-                return result;
-            } catch (IOException exception) {
-            }
-        } catch (IOException exception) {
-        }
-
-        return null;
-    }
 
     private int findMaxLineLength(String[] lines) {
         int result = 0;

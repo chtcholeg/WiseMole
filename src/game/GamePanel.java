@@ -32,12 +32,6 @@ public class GamePanel extends GamePanelBase implements KeyListener {
         public void onGamePanelCommandExit(Game currentGame);
     }
 
-    public GamePanel(String levelId, Callback gamePanelCallback) {
-        callback = gamePanelCallback;
-        setGame(new Game());
-        getGame().loadGame(levelId);
-    }
-
     public GamePanel(Game passedGame, Callback gamePanelCallback) {
         callback = gamePanelCallback;
         setGame(passedGame);
