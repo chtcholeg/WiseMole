@@ -128,6 +128,13 @@ public class Application extends JFrame
         setPanel(new MainMenuPanel(this, closedGame != null));
     }
 
+    @Override
+    public void onGamePanelCommandExitOnVictory() {
+        currentPredefinedLevelIndex++;
+        closedGame = null;
+        setPanel(new MainMenuPanel(this, false));
+    }
+
     private PanelBase currentPanel = null;
     private Font applicationFont = null;
     private int currentPredefinedLevelIndex = 1;

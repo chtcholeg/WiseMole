@@ -45,9 +45,21 @@ final public class Game {
         public void onGameSizeChanged();
     }
 
+    public interface ActionListener {
+        public void onGameMoleMove();
+
+        public void onGameUserWon();
+    }
+
     public void addSizeListener(SizeListener listener) {
         if (listener != null) {
             sizeListeners.add(listener);
+        }
+    }
+
+    public void addActionListener(ActionListener listener) {
+        if (listener != null) {
+            actionListeners.add(listener);
         }
     }
 
@@ -198,6 +210,16 @@ final public class Game {
         return loadGame(lineArray);
     }
 
+    public void checkIfUserWon() {
+        PointSet boxSet = new PointSet(boxes);
+        for (Point point : targetPoints) {
+            if (!boxSet.has(point)) {
+                return;
+            }
+        }
+        fireUserWon();
+    }
+
     protected boolean tryToMoveMole(MoleMovementDirection direction) {
         if (!canMoveMole(direction)) {
             return false;
@@ -206,64 +228,12 @@ final public class Game {
         return true;
     }
 
-    public void createDefGame() {
-        field = new Field();
-        field.setSize(7, 6);
-        field.at(0, 0).type = Cell.Type.WALL;
-        field.at(1, 0).type = Cell.Type.WALL;
-        field.at(2, 0).type = Cell.Type.WALL;
-        field.at(3, 0).type = Cell.Type.WALL;
-        field.at(4, 0).type = Cell.Type.WALL;
-        field.at(5, 0).type = Cell.Type.WALL;
-        field.at(6, 0).type = Cell.Type.WALL;
-
-        field.at(0, 1).type = Cell.Type.WALL;
-        field.at(1, 1).type = Cell.Type.FLOOR;
-        field.at(2, 1).type = Cell.Type.FLOOR;
-        field.at(3, 1).type = Cell.Type.FLOOR;
-        field.at(4, 1).type = Cell.Type.FLOOR;
-        field.at(5, 1).type = Cell.Type.FLOOR;
-        field.at(6, 1).type = Cell.Type.WALL;
-
-        field.at(0, 2).type = Cell.Type.WALL;
-        field.at(1, 2).type = Cell.Type.FLOOR;
-        field.at(2, 2).type = Cell.Type.FLOOR;
-        field.at(3, 2).type = Cell.Type.FLOOR;
-        field.at(4, 2).type = Cell.Type.FLOOR;
-        field.at(5, 2).type = Cell.Type.FLOOR;
-        field.at(6, 2).type = Cell.Type.WALL;
-
-        field.at(0, 3).type = Cell.Type.WALL;
-        field.at(1, 3).type = Cell.Type.FLOOR;
-        field.at(2, 3).type = Cell.Type.FLOOR;
-        field.at(3, 3).type = Cell.Type.FLOOR;
-        field.at(4, 3).type = Cell.Type.FLOOR;
-        field.at(5, 3).type = Cell.Type.FLOOR;
-        field.at(6, 3).type = Cell.Type.WALL;
-
-        field.at(0, 4).type = Cell.Type.WALL;
-        field.at(1, 4).type = Cell.Type.FLOOR;
-        field.at(2, 4).type = Cell.Type.FLOOR;
-        field.at(3, 4).type = Cell.Type.FLOOR;
-        field.at(4, 4).type = Cell.Type.FLOOR;
-        field.at(5, 4).type = Cell.Type.WALL;
-        field.at(6, 4).type = Cell.Type.WALL;
-
-        field.at(0, 5).type = Cell.Type.WALL;
-        field.at(1, 5).type = Cell.Type.WALL;
-        field.at(2, 5).type = Cell.Type.WALL;
-        field.at(3, 5).type = Cell.Type.WALL;
-        field.at(4, 5).type = Cell.Type.WALL;
-        field.at(5, 5).type = Cell.Type.WALL;
-
-        moleLocation = new Point(2, 2);
-    }
-
     private Field field = null;
     private Point moleLocation = null;
     private List<Point> boxes = new ArrayList<Point>();
     private List<Point> targetPoints = new ArrayList<Point>();
     private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
+    private List<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
     private int findMaxLineLength(String[] lines) {
         int result = 0;
@@ -342,6 +312,9 @@ final public class Game {
         }
 
         moleLocation = newMoleLocation;
+        fireMoleMove();
+
+        checkIfUserWon();
     }
 
     private static void setItem(List<Point> points, Point point, boolean enable) {
@@ -370,6 +343,18 @@ final public class Game {
         }
         boxes.removeIf(box -> isOutside(fieldSize, box));
         targetPoints.removeIf(point -> isOutside(fieldSize, point));
+    }
+
+    private void fireMoleMove() {
+        for (ActionListener listener : actionListeners) {
+            listener.onGameMoleMove();
+        }
+    }
+
+    private void fireUserWon() {
+        for (ActionListener listener : actionListeners) {
+            listener.onGameUserWon();
+        }
     }
 
     private enum CellDataByte {

@@ -27,7 +27,7 @@ public class Lang {
     public enum Res {
         PLAY, CREATE, CONTINUE, SELECT_PREDEFINED, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, GO_BACK,
         DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT,
-        ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION
+        ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION, VICTORY
     }
 
     static public String get(Res res) {
@@ -64,6 +64,8 @@ public class Lang {
                 return "target point count is more than box count";
             case WISE_MOLE_LEVEL_FILE_DESCRIPTION:
                 return "Wise Mole level file";
+            case VICTORY:
+                return "Victory!";
             default:
                 return "<Unknown>";
         }
