@@ -27,6 +27,7 @@ import java.awt.event.KeyListener;
 import common.Lang;
 import utils.FontUtils;
 import utils.RectangleUtils;
+import utils.SystemUtils;
 
 /**
  * The {@GamePanel} is a panel that is responsible for drawing the game board
@@ -55,7 +56,7 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
 
         drawField(graphics);
         if (userWon) {
-            drawWinPlate(graphics);
+            drawVictoryPlate(graphics);
         }
     }
 
@@ -70,9 +71,8 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
 
     @Override
     public void keyPressed(KeyEvent e) {
-        final int keyCode = e.getKeyCode();
         boolean haveChanges = false;
-        switch (keyCode) {
+        switch (e.getKeyCode()) {
             case KeyEvent.VK_UP:
                 haveChanges = getGame().tryToMoveMole(Game.MoleMovementDirection.UP);
                 break;
@@ -99,6 +99,8 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
                     }
                 }
                 break;
+            default:
+                haveChanges = processPlatformDepended(e);
         }
         if (haveChanges) {
             revalidate();
@@ -122,7 +124,7 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         repaint();
     }
 
-    private void drawWinPlate(Graphics graphics) {
+    private void drawVictoryPlate(Graphics graphics) {
         final Rectangle fieldArea = renderDetails.fieldArea;
         RectangleUtils.deflateRect(fieldArea, fieldArea.width / 4, fieldArea.height / 4);
         graphics.setColor(Color.RED);
@@ -142,6 +144,27 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         final int y = fieldArea.y + (fieldArea.height + fontHeight) / 2;
         graphics.drawString(text, x, y);
         graphics.setFont(currentFont);
+    }
+
+    private boolean processPlatformDepended(KeyEvent e) {
+        if (SystemUtils.getOSFamily() == SystemUtils.OSFamily.MACOS) {
+            if (e.getKeyCode() == KeyEvent.VK_Z) {
+                final boolean commandPressed = e.isMetaDown();
+                final boolean shiftPressed = e.isShiftDown();
+                if (commandPressed) {
+                    return shiftPressed ? getGame().redo() : getGame().undo();
+                }
+            }
+        } else {
+            if (e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown()) {
+                return getGame().undo();
+            }
+            if (e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown()) {
+                return getGame().redo();
+            }
+
+        }
+        return false;
     }
 
     private boolean userWon = false;

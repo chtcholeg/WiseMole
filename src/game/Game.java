@@ -86,19 +86,19 @@ final public class Game {
     }
 
     public Point getMolePosition() {
-        return moleLocation;
+        return currentState.moleLocation;
     }
 
     public void setMolePosition(Point point) {
-        moleLocation = point;
+        currentState.moleLocation = point;
     }
 
     public List<Point> getBoxes() {
-        return boxes;
+        return currentState.boxes;
     }
 
     public void setBoxPoint(Point point, boolean enable) {
-        setItem(boxes, point, enable);
+        setItem(currentState.boxes, point, enable);
     }
 
     public List<Point> getTargetPoints() {
@@ -131,10 +131,11 @@ final public class Game {
         if (cell.type == Cell.Type.WALL) {
             return CellDataByte.WALL.toByte();
         }
-        if ((moleLocation != null) && (moleLocation.x == x) && (moleLocation.y == y)) {
+        if ((currentState.moleLocation != null) && (currentState.moleLocation.x == x)
+                && (currentState.moleLocation.y == y)) {
             return CellDataByte.MOLE.toByte();
         }
-        final boolean hasBox = boxes.contains(new Point(x, y));
+        final boolean hasBox = currentState.boxes.contains(new Point(x, y));
         final boolean hasTargetPoint = targetPoints.contains(new Point(x, y));
         if (hasBox && hasTargetPoint) {
             return CellDataByte.ACTIVE_BOX.toByte();
@@ -161,6 +162,7 @@ final public class Game {
 
         field = new Field();
         field.setSize(maxLineLength, lines.length);
+        currentState = new GameState();
         for (int y = 0; y < lines.length; ++y) {
             String line = lines[y];
             for (int x = 0; x < maxLineLength; ++x) {
@@ -177,15 +179,15 @@ final public class Game {
                         cell.type = Cell.Type.FLOOR;
                         break;
                     case MOLE:
-                        moleLocation = new Point(x, y);
+                        currentState.moleLocation = new Point(x, y);
                         cell.type = Cell.Type.FLOOR;
                         break;
                     case INACTIVE_BOX:
-                        boxes.add(new Point(x, y));
+                        currentState.boxes.add(new Point(x, y));
                         cell.type = Cell.Type.FLOOR;
                         break;
                     case ACTIVE_BOX:
-                        boxes.add(new Point(x, y));
+                        currentState.boxes.add(new Point(x, y));
                         targetPoints.add(new Point(x, y));
                         cell.type = Cell.Type.FLOOR;
                         break;
@@ -198,6 +200,9 @@ final public class Game {
                 }
             }
         }
+
+        history.add(currentState);
+
         return true;
     }
 
@@ -211,7 +216,7 @@ final public class Game {
     }
 
     public void checkIfUserWon() {
-        PointSet boxSet = new PointSet(boxes);
+        PointSet boxSet = new PointSet(currentState.boxes);
         for (Point point : targetPoints) {
             if (!boxSet.has(point)) {
                 return;
@@ -220,6 +225,46 @@ final public class Game {
         fireUserWon();
     }
 
+    public boolean canUndo() {
+        return history.canUndo();
+    }
+
+    public boolean undo() {
+        if (!canUndo()) {
+            return false;
+        }
+
+        GameState state = history.undo();
+        if (state == null) {
+            return false;
+        }
+        currentState = state;
+        return true;
+    }
+
+    public boolean canRedo() {
+        return history.canRedo();
+    }
+
+    public boolean redo() {
+        if (!canRedo()) {
+            return false;
+        }
+        GameState state = history.redo();
+        if (state == null) {
+            return false;
+        }
+        currentState = state;
+        return true;
+    }
+
+    private Field field = null;
+    private GameState currentState = new GameState();
+    private StepHistory history = new StepHistory();
+    private List<Point> targetPoints = new ArrayList<Point>();
+    private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
+    private List<ActionListener> actionListeners = new ArrayList<ActionListener>();
+
     protected boolean tryToMoveMole(MoleMovementDirection direction) {
         if (!canMoveMole(direction)) {
             return false;
@@ -227,13 +272,6 @@ final public class Game {
         moveMole(direction);
         return true;
     }
-
-    private Field field = null;
-    private Point moleLocation = null;
-    private List<Point> boxes = new ArrayList<Point>();
-    private List<Point> targetPoints = new ArrayList<Point>();
-    private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
-    private List<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
     private int findMaxLineLength(String[] lines) {
         int result = 0;
@@ -265,15 +303,16 @@ final public class Game {
         }
 
         // Check floor cell
-        Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
+        Point newMoleLocation = new Point(currentState.moleLocation.x + offset.x,
+                currentState.moleLocation.y + offset.y);
         if (!floor.has(newMoleLocation)) {
             return false;
         }
 
         // Do we have a box on this cell?
         boolean hasBox = false;
-        for (int index = 0; index < boxes.size(); ++index) {
-            Point box = boxes.get(index);
+        for (int index = 0; index < currentState.boxes.size(); ++index) {
+            Point box = currentState.boxes.get(index);
             if (box.equals(newMoleLocation)) {
                 hasBox = true;
                 break;
@@ -288,7 +327,7 @@ final public class Game {
         if (!floor.has(newBoxLocation)) {
             return false;
         }
-        PointSet boxSet = new PointSet(boxes);
+        PointSet boxSet = new PointSet(currentState.boxes);
         if (boxSet.has(newBoxLocation)) {
             return false;
         }
@@ -301,17 +340,19 @@ final public class Game {
             return;
         }
         Point offset = convertDirectionToPoint(direction);
-        Point newMoleLocation = new Point(moleLocation.x + offset.x, moleLocation.y + offset.y);
+        Point newMoleLocation = new Point(currentState.moleLocation.x + offset.x,
+                currentState.moleLocation.y + offset.y);
 
-        for (int index = 0; index < boxes.size(); ++index) {
-            Point box = boxes.get(index);
+        for (int index = 0; index < currentState.boxes.size(); ++index) {
+            Point box = currentState.boxes.get(index);
             if (box.equals(newMoleLocation)) {
                 box.translate(offset.x, offset.y);
                 break;
             }
         }
 
-        moleLocation = newMoleLocation;
+        currentState.moleLocation = newMoleLocation;
+        history.add(currentState);
         fireMoleMove();
 
         checkIfUserWon();
@@ -338,10 +379,10 @@ final public class Game {
 
     private void removeOutsideObject() {
         final Dimension fieldSize = getFieldSize();
-        if (isOutside(fieldSize, moleLocation)) {
-            moleLocation = null;
+        if (isOutside(fieldSize, currentState.moleLocation)) {
+            currentState.moleLocation = null;
         }
-        boxes.removeIf(box -> isOutside(fieldSize, box));
+        currentState.boxes.removeIf(box -> isOutside(fieldSize, box));
         targetPoints.removeIf(point -> isOutside(fieldSize, point));
     }
 
