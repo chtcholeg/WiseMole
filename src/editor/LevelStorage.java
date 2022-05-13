@@ -45,6 +45,7 @@ import game.Game;
  */
 
 public class LevelStorage {
+
     static public void save(Component dialogParent, Game game) throws IOException {
         final String issue = validateGame(game);
         if ((issue != null) && !issue.isEmpty()) {
@@ -102,6 +103,16 @@ public class LevelStorage {
     public static boolean hasPredefined(int index) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         return classLoader.getResource(getPredefinedResourceId(index)) != null;
+    }
+
+    public static int predefinedLevelCount() {
+        if (levelCount == null) {
+            levelCount = 0;
+            for (int i = 1; hasPredefined(i); ++i) {
+                levelCount = i;
+            }
+        }
+        return levelCount;
     }
 
     static public Game loadPredefined(int index) {
@@ -172,6 +183,8 @@ public class LevelStorage {
     private static String getPredefinedResourceId(Integer index) {
         return "game/level" + index.toString() + "." + LEVEL_FILE_EXTENSION;
     }
+
+    static private Integer levelCount;
 
     final static private String LEVEL_FILE_EXTENSION = "wmgame";
 }

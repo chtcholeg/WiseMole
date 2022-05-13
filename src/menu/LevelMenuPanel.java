@@ -38,14 +38,9 @@ public class LevelMenuPanel extends MenuPanelBase {
 
     public LevelMenuPanel(Callback levelMenuCallback) {
         callback = levelMenuCallback;
-
-        for (int i = 1; LevelStorage.hasPredefined(i); ++i) {
-            levelCount = i;
-        }
     }
 
     private Callback callback = null;
-    private int levelCount = 0;
     private static final int GO_BACK = 0;
     private static final long serialVersionUID = 1L;
 
@@ -57,7 +52,7 @@ public class LevelMenuPanel extends MenuPanelBase {
     @Override
     protected List<Integer> getItems() {
         final List<Integer> items = new ArrayList<Integer>();
-        for (int i = 1; i <= levelCount; ++i) {
+        for (int i = 1; i <= LevelStorage.predefinedLevelCount(); ++i) {
             items.add(i);
         }
         items.add(GO_BACK);
@@ -69,7 +64,7 @@ public class LevelMenuPanel extends MenuPanelBase {
         if (callback == null) {
             return;
         }
-        if (itemId < 0 || itemId > levelCount) {
+        if (itemId < 0 || itemId > LevelStorage.predefinedLevelCount()) {
             return;
         }
         if (itemId == GO_BACK) {

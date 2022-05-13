@@ -130,7 +130,7 @@ public class Application extends JFrame
 
     @Override
     public void onGamePanelCommandExitOnVictory() {
-        currentPredefinedLevelIndex++;
+        currentPredefinedLevelIndex = Math.min(currentPredefinedLevelIndex + 1, LevelStorage.predefinedLevelCount());
         closedGame = null;
         setPanel(new MainMenuPanel(this, false));
     }
