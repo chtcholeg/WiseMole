@@ -83,7 +83,7 @@ public class Application extends JFrame
 
     @Override
     public void onMainMenuCommandSelectPredefined() {
-        setPanel(new LevelMenuPanel(this));
+        setPanel(new LevelMenuPanel(this, currentPredefinedLevelIndex));
     }
 
     @Override

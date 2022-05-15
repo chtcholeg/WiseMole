@@ -257,4 +257,10 @@ public class MenuPanelBase extends PanelBase implements KeyListener, MouseListen
         return "<Unknown>";
     }
 
+    protected void selectItem(int index) {
+        if (selectedItemIndex != index) {
+            selectedItemIndex = index;
+            repaint();
+        }
+    }
 }

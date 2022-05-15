@@ -36,8 +36,9 @@ public class LevelMenuPanel extends MenuPanelBase {
         public void onLevelMenuCommandExit();
     }
 
-    public LevelMenuPanel(Callback levelMenuCallback) {
+    public LevelMenuPanel(Callback levelMenuCallback, Integer selectedLevel) {
         callback = levelMenuCallback;
+        selectItem(selectedLevel - 1);
     }
 
     private Callback callback = null;
