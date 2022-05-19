@@ -239,6 +239,8 @@ final public class Game {
             return false;
         }
         currentState = state;
+        --stepCount;
+        fireMoleMove();
         return true;
     }
 
@@ -255,7 +257,13 @@ final public class Game {
             return false;
         }
         currentState = state;
+        ++stepCount;
+        fireMoleMove();
         return true;
+    }
+
+    public int getStepCount() {
+        return stepCount;
     }
 
     private Field field = null;
@@ -264,6 +272,7 @@ final public class Game {
     private List<Point> targetPoints = new ArrayList<Point>();
     private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
     private List<ActionListener> actionListeners = new ArrayList<ActionListener>();
+    private int stepCount = 0;
 
     protected boolean tryToMoveMole(MoleMovementDirection direction) {
         if (!canMoveMole(direction)) {
@@ -339,6 +348,7 @@ final public class Game {
         if (!canMoveMole(direction)) {
             return;
         }
+        ++stepCount;
         Point offset = convertDirectionToPoint(direction);
         Point newMoleLocation = new Point(currentState.moleLocation.x + offset.x,
                 currentState.moleLocation.y + offset.y);

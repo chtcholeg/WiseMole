@@ -14,7 +14,7 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
 /**
  * The {@SpaceControl} is class presents empty space.

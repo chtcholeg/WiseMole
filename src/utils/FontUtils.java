@@ -16,9 +16,11 @@
 
 package utils;
 
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 /**
  * The {@ImageStorage} is a set of font/text utils
@@ -36,4 +38,10 @@ public class FontUtils {
         return (int) (originalFontHeight / transform.getScaleY());
     }
 
+    public static int calculateTextWidth(Font font, String text) {
+        AffineTransform affinetransform = new AffineTransform();
+        FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
+        Rectangle2D rect = font.getStringBounds(text, frc);
+        return (int) rect.getWidth();
+    }
 }

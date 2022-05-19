@@ -31,19 +31,17 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import common.Lang;
-import controls.ButtonControl;
-import controls.ControlBase;
-import controls.ImageControl;
-import controls.LabelControl;
-import controls.NumericLeftRightControl;
-import controls.SpaceControl;
+import common.PanelBar;
+import common.controls.ButtonControl;
+import common.controls.ControlBase;
+import common.controls.ImageControl;
+import common.controls.LabelControl;
+import common.controls.NumericLeftRightControl;
 import game.Cell;
 import game.Game;
 import game.GamePanelBase;
-import utils.ControlPlacer;
 import utils.Margins;
 import utils.PanelUtils;
 import utils.RectangleUtils;
@@ -62,21 +60,14 @@ public class EditorPanel extends GamePanelBase
     }
 
     public EditorPanel(Callback editorPanelCallback) {
-        toolPanelWidth = NumericLeftRightControl.getImageWidth() + 2 * PADDING;
-        setMargins(new Margins(toolPanelWidth, 0, 0, 0));
+        sidebarWidth = NumericLeftRightControl.getImageWidth() + 2 * PADDING;
+        setMargins(new Margins(sidebarWidth, 0, 0, 0));
         callback = editorPanelCallback;
 
         setGame(new Game());
         getGame().setFieldSize(new Dimension(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
 
         initControls();
-        updateControlsPostions();
-    }
-
-    @Override
-    public void onResize() {
-        updateControlsPostions();
-        super.onResize();
     }
 
     @Override
@@ -118,11 +109,10 @@ public class EditorPanel extends GamePanelBase
     @Override
     public void mouseMoved(MouseEvent e) {
         Point mousePos = PanelUtils.getRelativePoint(e, this);
-        final int index = getIndexOfControlUnderPoint(mousePos);
-        if (index == -1) {
+        final ControlBase control = getControlUnderPoint(mousePos);
+        if (control == null) {
             setCursor(Cursor.DEFAULT_CURSOR);
         } else {
-            ControlBase control = controls.get(index).control;
             final Rectangle position = control.getPosition();
             mousePos.translate(-position.x, -position.y);
             setCursor(control.onMouseMove(mousePos));
@@ -134,7 +124,6 @@ public class EditorPanel extends GamePanelBase
         super.paintComponent(graphics);
 
         if (getGame() != null) {
-            drawToolPanel(graphics);
             drawField(graphics);
             drawFieldGrid(graphics);
         }
@@ -201,6 +190,14 @@ public class EditorPanel extends GamePanelBase
         }
     }
 
+    @Override
+    protected Rectangle calcBarArea(PanelBar bar) {
+        if (bar == sidebar) {
+            return calcSidebarRect();
+        }
+        return null;
+    }
+
     private void drawFieldGrid(Graphics graphics) {
         renderIfRequired();
         final Dimension fieldSize = getGame().getFieldSize();
@@ -231,115 +228,80 @@ public class EditorPanel extends GamePanelBase
         graphics2d.dispose();
     }
 
-    private void drawToolPanel(Graphics graphics) {
-        for (ControlInfo controlInfo : controls) {
-            controlInfo.control.paint(graphics);
-        }
-    }
-
-    private Rectangle calcToolPanelRect() {
-        return new Rectangle(0, 0, toolPanelWidth, getSize().height);
+    private Rectangle calcSidebarRect() {
+        Rectangle result = new Rectangle(0, 0, sidebarWidth, getSize().height);
+        RectangleUtils.deflateRect(result, PADDING, 2 * PADDING);
+        return result;
     }
 
     private void initControls() {
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("mole.png", MOLE_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("box_active.png", BOX_ACTIVE_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("box_inactive.png", BOX_INACTIVE_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("target_point.png", TARGET_POINT_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("wall.png", WALL_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addClickableTopImage("floor.png", FLOOR_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addTopLabel(Lang.Res.HEIGHT);
-        addTopSpacer(PADDING / 2);
+        sidebar.addSpacer(true, PADDING / 2);
         addTopNumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT, DEFAULT_FIELD_HEIGHT, HEIGHT_CONTROL_ID);
 
-        addTopSpacer(PADDING);
+        sidebar.addSpacer(true, PADDING);
         addTopLabel(Lang.Res.WIDTH);
-        addTopSpacer(PADDING / 2);
+        sidebar.addSpacer(true, PADDING / 2);
         addTopNumericLeftRightControl(1, Game.MAX_FIELD_WIDTH, DEFAULT_FIELD_WIDTH, WIDTH_CONTROL_ID);
 
-        addBottomSpacer(PADDING);
+        sidebar.addSpacer(false, PADDING);
         addClickableBottomButton(Lang.Res.SAVE, SAVE_BUTTON_CONTROL_ID);
 
-        addBottomSpacer(PADDING);
+        sidebar.addSpacer(false, PADDING);
         addClickableBottomButton(Lang.Res.EXIT, EXIT_BUTTON_CONTROL_ID);
-    }
 
-    private void addTopSpacer(int padding) {
-        controls.add(new ControlInfo(new SpaceControl(PADDING, padding), true));
-    }
-
-    private void addBottomSpacer(int padding) {
-        controls.add(new ControlInfo(new SpaceControl(PADDING, padding), false));
+        addBar(sidebar);
     }
 
     private void addClickableTopImage(String resourceId, String controlId) {
-        addClickableControl(new ControlInfo(new ImageControl(resourceId, controlId, true), true));
+        addClickableControl(new ImageControl(resourceId, controlId, true), true);
     }
 
     private void addTopLabel(Lang.Res stringId) {
-        controls.add(new ControlInfo(new LabelControl(Lang.get(stringId), LabelControl.Alignment.CENTER), true));
+        sidebar.addControl(new LabelControl(Lang.get(stringId), LabelControl.Alignment.CENTER), true);
     }
 
     private void addTopNumericLeftRightControl(int min, int max, int initValue, String controlId) {
-        controls.add(new ControlInfo(new NumericLeftRightControl(min, max, initValue, controlId, this)));
+        sidebar.addControl(new NumericLeftRightControl(min, max, initValue, controlId, this), true);
     }
 
     private void addClickableBottomButton(Lang.Res stringId, String controlId) {
-        addClickableControl(new ControlInfo(new ButtonControl(Lang.get(stringId), controlId), false));
+        addClickableControl(new ButtonControl(Lang.get(stringId), controlId), false);
     }
 
-    private void addClickableControl(ControlInfo controlInfo) {
-        controlInfo.control.addClickListener(this);
-        controls.add(controlInfo);
+    private void addClickableControl(ControlBase control, boolean top) {
+        control.addClickListener(this);
+        sidebar.addControl(control, top);
     }
 
-    private void updateControlsPostions() {
-        Rectangle toolPanelRect = calcToolPanelRect();
-        RectangleUtils.deflateRect(toolPanelRect, PADDING, 2 * PADDING);
-        ControlPlacer placer = new ControlPlacer(toolPanelRect);
-
-        for (ControlInfo controlInfo : controls) {
-            ControlBase control = controlInfo.control;
-            if (controlInfo.placeToTop) {
-                control.setPosition(placer.addTop(control.getIdealWidth(), control.getIdealHeight()));
-            }
-        }
-
-        ListIterator<ControlInfo> controlIterator = controls.listIterator(controls.size());
-        while (controlIterator.hasPrevious()) {
-            ControlInfo controlInfo = controlIterator.previous();
-            if (!controlInfo.placeToTop) {
-                ControlBase control = controlInfo.control;
-                control.setPosition(placer.addBottom(control.getIdealWidth(), control.getIdealHeight()));
-            }
-        }
-
-        revalidate();
-        repaint();
-    }
-
-    private int getIndexOfControlUnderPoint(Point point) {
-        for (int index = 0; index < controls.size(); ++index) {
-            final ControlBase control = controls.get(index).control;
+    private ControlBase getControlUnderPoint(Point point) {
+        List<ControlBase> sidebarControls = sidebar.getControls();
+        for (ControlBase control : sidebarControls) {
             final Rectangle rect = control.getPosition();
             if (rect.contains(point)) {
-                return index;
+                return control;
             }
         }
-        return -1;
+        return null;
     }
 
     private void setCursor(int cursorId) {
@@ -348,9 +310,10 @@ public class EditorPanel extends GamePanelBase
 
     private List<ControlBase> getControlsByType(String type) {
         List<ControlBase> result = new ArrayList<ControlBase>();
-        for (ControlInfo controlinfo : controls) {
-            if (controlinfo.control.getType() == type) {
-                result.add(controlinfo.control);
+        List<ControlBase> controls = sidebar.getControls();
+        for (ControlBase control : controls) {
+            if (control.getType() == type) {
+                result.add(control);
             }
         }
         return result;
@@ -409,15 +372,14 @@ public class EditorPanel extends GamePanelBase
 
     private void processClick(MouseEvent e) {
         Point mousePos = PanelUtils.getRelativePoint(e, this);
-        final int index = getIndexOfControlUnderPoint(mousePos);
-        if (index == -1) {
+        final ControlBase control = getControlUnderPoint(mousePos);
+        if (control == null) {
             final Point coordinates = findCellUnderPoint((Point) mousePos.clone());
             if (coordinates != null) {
                 FieldType fieldType = (e.getButton() == MouseEvent.BUTTON1) ? selectedFieldType : FieldType.NULL;
                 applySelectedCell(coordinates, fieldType);
             }
         } else {
-            ControlBase control = controls.get(index).control;
             final Rectangle position = control.getPosition();
             mousePos.translate(-position.x, -position.y);
             control.onMouseClick(mousePos);
@@ -432,23 +394,9 @@ public class EditorPanel extends GamePanelBase
         MOLE, BOX_ACTIVE, BOX_INACTIVE, TARGET_POINT, WALL, FLOOR, NULL
     }
 
-    private class ControlInfo {
-        public ControlBase control = null;
-        public boolean placeToTop = true;
-
-        public ControlInfo(ControlBase control) {
-            this(control, true);
-        }
-
-        public ControlInfo(ControlBase control, boolean top) {
-            this.control = control;
-            this.placeToTop = top;
-        }
-    }
-
     private Callback callback = null;
-    private List<ControlInfo> controls = new ArrayList<ControlInfo>();
-    private int toolPanelWidth = 100;
+    private PanelBar sidebar = new PanelBar(false);
+    private int sidebarWidth = 100;
     private FieldType selectedFieldType = FieldType.NULL;
     private static final int DEFAULT_FIELD_WIDTH = 25;
     private static final int DEFAULT_FIELD_HEIGHT = 15;

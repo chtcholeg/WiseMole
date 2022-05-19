@@ -14,7 +14,7 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

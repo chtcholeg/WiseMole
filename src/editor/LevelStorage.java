@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +48,7 @@ public class LevelStorage {
     static public void save(Component dialogParent, Game game) throws IOException {
         final String issue = validateGame(game);
         if ((issue != null) && !issue.isEmpty()) {
-            final String textTemplate = Lang.get(Lang.Res.DIALOG_GAME_VALIDATION_TEXT);
-            final String text = MessageFormat.format(textTemplate, issue);
+            final String text = Lang.get(Lang.Res.DIALOG_GAME_VALIDATION_TEXT, issue);
             if (JOptionPane.showConfirmDialog(dialogParent, text, Lang.get(Lang.Res.DIALOG_OVERWRITE_CONFIRM_TITLE),
                     JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                 return;

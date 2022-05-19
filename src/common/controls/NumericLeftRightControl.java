@@ -14,7 +14,7 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -59,6 +59,10 @@ public class NumericLeftRightControl extends ControlBase {
 
     public static int getImageWidth() {
         return controlImage.getWidth(null);
+    }
+
+    public static int getImageHeight() {
+        return controlImage.getHeight(null);
     }
 
     @Override

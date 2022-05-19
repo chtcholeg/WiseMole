@@ -14,7 +14,7 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
 import java.awt.Cursor;
 import java.awt.Graphics;

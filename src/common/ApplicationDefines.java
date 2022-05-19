@@ -17,6 +17,11 @@
 package common;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The {@ApplicationDefines} class that contains all main constants.
@@ -27,5 +32,18 @@ import java.awt.Dimension;
 
 public class ApplicationDefines {
     static public final float FONT_SIZE = 20f;
+    static public Font font = null;
     static public final Dimension DEFAULT_FRAME_SIZE = new Dimension(800, 800);
+
+    static public void init() {
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            InputStream input = classLoader.getResourceAsStream("font/pixy/PIXY.ttf");
+            font = Font.createFont(Font.TRUETYPE_FONT, input).deriveFont(ApplicationDefines.FONT_SIZE);
+            GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            graphicsEnvironment.registerFont(font);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+        }
+    }
 }

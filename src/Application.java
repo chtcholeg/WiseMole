@@ -14,12 +14,6 @@
  * the License.
  */
 
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.GraphicsEnvironment;
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.swing.JFrame;
 
 import common.ApplicationDefines;
@@ -43,14 +37,14 @@ import utils.ImageStorage;
 public class Application extends JFrame
         implements MainMenuPanel.Callback, LevelMenuPanel.Callback, GamePanel.Callback, EditorPanel.Callback {
     public static void main(String[] args) {
+        ApplicationDefines.init();
+
         Application app = new Application();
         app.setVisible(true);
     }
 
     public Application() {
         this.setIconImage(ImageStorage.getImage("app_icon.png"));
-
-        initFont();
 
         setPanel(new MainMenuPanel(this, closedGame != null));
 
@@ -60,18 +54,6 @@ public class Application extends JFrame
         setTitle("Wise Mole");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-    }
-
-    private void initFont() {
-        try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            InputStream input = classLoader.getResourceAsStream("font/pixy/PIXY.ttf");
-            applicationFont = Font.createFont(Font.TRUETYPE_FONT, input).deriveFont(ApplicationDefines.FONT_SIZE);
-            GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            graphicsEnvironment.registerFont(applicationFont);
-        } catch (IOException | FontFormatException e) {
-            e.printStackTrace();
-        }
     }
 
     // MainMenuPanel.Callback
@@ -136,7 +118,6 @@ public class Application extends JFrame
     }
 
     private PanelBase currentPanel = null;
-    private Font applicationFont = null;
     private int currentPredefinedLevelIndex = 1;
     private Game closedGame = null;
     private static final long serialVersionUID = 1L;
@@ -149,7 +130,7 @@ public class Application extends JFrame
             remove(currentPanel);
         }
         currentPanel = panel;
-        currentPanel.setFont(applicationFont);
+        currentPanel.setFont(ApplicationDefines.font);
         addKeyListener(currentPanel.keyListener());
         addMouseListener(currentPanel.mouseListener());
         addMouseMotionListener(currentPanel.mouseMotionListener());

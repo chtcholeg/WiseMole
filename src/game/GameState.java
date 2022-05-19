@@ -32,13 +32,13 @@ public class GameState implements Cloneable {
     @Override
     public Object clone() {
         GameState result = new GameState();
-        result.moleLocation = (Point) moleLocation.clone();
+        result.moleLocation = moleLocation == null ? null : (Point) moleLocation.clone();
         for (Point box : boxes) {
             result.boxes.add((Point) box.clone());
         }
         return result;
     }
 
-    public Point moleLocation = new Point(0, 0);
+    public Point moleLocation = null;
     public List<Point> boxes = new ArrayList<Point>();
 }

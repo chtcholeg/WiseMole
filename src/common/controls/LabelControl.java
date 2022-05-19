@@ -14,11 +14,14 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.Objects;
 
+import common.ApplicationDefines;
 import utils.FontUtils;
 
 /**
@@ -35,10 +38,15 @@ public class LabelControl extends ControlBase {
         LEFT, CENTER
     }
 
-    public LabelControl(String labelText, Alignment alignment) {
+    public LabelControl(String labelText, Alignment alignment, Integer fixWidth) {
         super(TYPE, "");
         setText(labelText);
         setAlignment(alignment);
+        setFixWidth(fixWidth);
+    }
+
+    public LabelControl(String labelText, Alignment alignment) {
+        this(labelText, alignment, null);
     }
 
     public LabelControl(String labelText) {
@@ -49,17 +57,35 @@ public class LabelControl extends ControlBase {
         this("");
     }
 
-    void setText(String labelText) {
-        text = labelText;
+    public void setText(String labelText) {
+        if (!Objects.equals(text, labelText)) {
+            text = labelText;
+        }
     }
 
-    void setAlignment(Alignment newAlignment) {
+    public void setAlignment(Alignment newAlignment) {
         alignment = newAlignment;
+    }
+
+    public void setFixWidth(Integer newFixWidth) {
+        fixWidth = newFixWidth;
     }
 
     @Override
     public int getIdealHeight() {
         return 20;
+    }
+
+    @Override
+    public int getIdealWidth() {
+        if (fixWidth != null) {
+            return fixWidth;
+        }
+        Font font = ApplicationDefines.font;
+        if (font == null || text == null) {
+            return 100;
+        }
+        return FontUtils.calculateTextWidth(font, text);
     }
 
     @Override
@@ -81,4 +107,5 @@ public class LabelControl extends ControlBase {
 
     private String text = null;
     private Alignment alignment = Alignment.LEFT;
+    private Integer fixWidth = null;
 }

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package controls;
+package common.controls;
 
 import java.awt.Graphics;
 import java.awt.Image;

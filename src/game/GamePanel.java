@@ -25,7 +25,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import common.Lang;
+import common.PanelBar;
+import common.controls.LabelControl;
+import common.controls.LabelControl.Alignment;
+import common.controls.NumericLeftRightControl;
 import utils.FontUtils;
+import utils.Margins;
 import utils.RectangleUtils;
 import utils.SystemUtils;
 
@@ -44,10 +49,15 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
     }
 
     public GamePanel(Game passedGame, Callback gamePanelCallback) {
+        topStatusBarHeight = stepCountValueLabel.getIdealHeight() + 2 * PADDING;
+        setMargins(new Margins(0, topStatusBarHeight, 0, 0));
+
         callback = gamePanelCallback;
         setGame(passedGame);
         passedGame.addActionListener(this);
         passedGame.checkIfUserWon();
+
+        initControls();
     }
 
     @Override
@@ -115,7 +125,8 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
 
     @Override
     public void onGameMoleMove() {
-
+        stepCountValueLabel.setText(Integer.toString(getGame().getStepCount()));
+        repaint();
     }
 
     @Override
@@ -124,10 +135,18 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         repaint();
     }
 
+    @Override
+    protected Rectangle calcBarArea(PanelBar bar) {
+        if (bar == topStatusBar) {
+            return calcTopStatusBarRect();
+        }
+        return null;
+    }
+
     private void drawVictoryPlate(Graphics graphics) {
         final Rectangle fieldArea = renderDetails.fieldArea;
         RectangleUtils.deflateRect(fieldArea, fieldArea.width / 4, fieldArea.height / 4);
-        graphics.setColor(Color.RED);
+        graphics.setColor(Color.GREEN);
         final int radius = (fieldArea.width + fieldArea.height) / 10;
         graphics.fillRoundRect(fieldArea.x, fieldArea.y, fieldArea.width, fieldArea.height, radius, radius);
 
@@ -167,7 +186,22 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         return false;
     }
 
+    private void initControls() {
+        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_SETP_COUNT_LABEL)), true);
+        topStatusBar.addControl(stepCountValueLabel, true);
+        addBar(topStatusBar);
+    }
+
+    private Rectangle calcTopStatusBarRect() {
+        Rectangle result = new Rectangle(0, 0, getSize().width, topStatusBarHeight);
+        RectangleUtils.deflateRect(result, PADDING, PADDING);
+        return result;
+    }
+
     private boolean userWon = false;
     private Callback callback = null;
+    private int topStatusBarHeight = NumericLeftRightControl.getImageHeight() + 2 * PADDING;
+    private PanelBar topStatusBar = new PanelBar(true);
+    private LabelControl stepCountValueLabel = new LabelControl("0", Alignment.LEFT, 200);
     private static final long serialVersionUID = 1L;
 }

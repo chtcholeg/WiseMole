@@ -49,6 +49,7 @@ public class GamePanelBase extends PanelBase implements Game.SizeListener
 
     @Override
     public void onResize() {
+        super.onResize();
         renderDetails = null;
         repaint();
     }
@@ -166,7 +167,7 @@ public class GamePanelBase extends PanelBase implements Game.SizeListener
                 renderDetails.cellSize.height);
     }
 
-    static boolean isValidPosition(Dimension fieldSize, Point position) {
+    static public boolean isValidPosition(Dimension fieldSize, Point position) {
         if (fieldSize == null || position == null) {
             return false;
         }

@@ -16,11 +16,15 @@
 
 package common;
 
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -61,6 +65,14 @@ public class PanelBase extends JPanel {
         addComponentListener(new ComponentListenerImpl(this));
     }
 
+    @Override
+    public void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+        for (PanelBar bar : bars) {
+            bar.paint(graphics);
+        }
+    }
+
     // If a child class wants to process key events, it has to return non-null
     // object
     public KeyListener keyListener() {
@@ -81,7 +93,31 @@ public class PanelBase extends JPanel {
 
     // Calls when the component has been resized
     public void onResize() {
+        updateBarPositions();
     }
+
+    // Adds bar to array of bars
+    protected void addBar(PanelBar bar) {
+        if (bar != null) {
+            bars.add(bar);
+        }
+        updateBarPositions();
+    }
+
+    // Returns rectangle of bar. This method has to be defined by an inheritor
+    protected Rectangle calcBarArea(PanelBar bar) {
+        return null;
+    }
+
+    // Updates all bars
+    protected void updateBarPositions() {
+        for (PanelBar bar : bars) {
+            bar.updatePostition(calcBarArea(bar));
+        }
+
+    }
+
+    protected List<PanelBar> bars = new ArrayList<PanelBar>();
 
     private static final long serialVersionUID = 1L;
 }

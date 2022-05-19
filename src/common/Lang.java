@@ -16,6 +16,8 @@
 
 package common;
 
+import java.text.MessageFormat;
+
 /**
  * The {@Lang} is class to get localized text resources.
  * 
@@ -27,10 +29,11 @@ public class Lang {
     public enum Res {
         PLAY, CREATE, CONTINUE, SELECT_PREDEFINED, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, GO_BACK,
         DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT,
-        ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION, VICTORY
+        ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION, VICTORY,
+        STATUSBAR_SETP_COUNT_LABEL
     }
 
-    static public String get(Res res) {
+    public static String get(Res res) {
         switch (res) {
             case PLAY:
                 return "Play";
@@ -66,8 +69,14 @@ public class Lang {
                 return "Wise Mole level file";
             case VICTORY:
                 return "Victory!";
+            case STATUSBAR_SETP_COUNT_LABEL:
+                return "Steps: ";
             default:
                 return "<Unknown>";
         }
+    }
+
+    public static String get(Res res, Object... arguments) {
+        return (new MessageFormat(get(res))).format(arguments);
     }
 }
