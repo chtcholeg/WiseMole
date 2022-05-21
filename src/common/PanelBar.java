@@ -50,22 +50,41 @@ public class PanelBar {
     }
 
     public void addSpacer(boolean leftOrTop, int size) {
-        addControl(new SpaceControl(size, size), leftOrTop);
+        addControl(new SpaceControl(size), leftOrTop);
+    }
+
+    public void addStretchableSpacer(boolean leftOrTop) {
+        addControl(new SpaceControl(), leftOrTop);
     }
 
     public void updatePostition(Rectangle rect) {
         Rectangle workRect = (Rectangle) rect.clone();
         HashMap<ControlBase, Rectangle> controlsPlaces = new HashMap<ControlBase, Rectangle>();
+        ArrayList<ControlBase> orderedControls = new ArrayList<ControlBase>();
+        int stretchableSpacerCount = 0;
 
         // 1. Locating fix-size controls
         for (ControlBase control : leftOrTopControls) {
             locateInitially(control, controlsPlaces, workRect, true);
+            orderedControls.add(control);
+            stretchableSpacerCount += (isStretchableSpacer(control) ? 1 : 0);
         }
+        final int insertPos = orderedControls.size();
         for (ControlBase control : rightOrBottomControls) {
             locateInitially(control, controlsPlaces, workRect, false);
+            orderedControls.add(insertPos, control);
+            stretchableSpacerCount += (isStretchableSpacer(control) ? 1 : 0);
         }
 
         // 2. Relocating if we have stretchable controls
+        if (stretchableSpacerCount > 0) {
+            final int freeSpaceSize = horizontal ? workRect.width : workRect.height;
+            final int stretchableSpacerSize = freeSpaceSize / stretchableSpacerCount;
+            int offset = 0;
+            for (ControlBase control : orderedControls) {
+                offset = correctPosBecauseOfStretch(controlsPlaces, control, stretchableSpacerSize, offset);
+            }
+        }
 
         // 3. Applying the result
         List<ControlBase> allControls = getControls();
@@ -121,6 +140,26 @@ public class PanelBar {
             }
         }
         controlsPlaces.put(control, controlRect);
+    }
+
+    private int correctPosBecauseOfStretch(HashMap<ControlBase, Rectangle> controlsPlaces, ControlBase control,
+            int freeSpaceSize, int offset) {
+        Rectangle rect = controlsPlaces.get(control);
+        if (horizontal) {
+            rect.x += offset;
+        } else {
+            rect.y += offset;
+        }
+        if (isStretchableSpacer(control)) {
+            rect.width = freeSpaceSize;
+            rect.height = freeSpaceSize;
+            offset += freeSpaceSize;
+        }
+        return offset;
+    }
+
+    private static boolean isStretchableSpacer(ControlBase control) {
+        return (control instanceof SpaceControl) && ((SpaceControl) control).isStretchable();
     }
 
     private boolean horizontal = false;

@@ -19,7 +19,9 @@ package game;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import utils.PointSet;
 
@@ -38,9 +40,6 @@ final public class Game {
     public final static int MAX_FIELD_WIDTH = 40;
     public final static int MAX_FIELD_HEIGHT = 40;
 
-    public Game() {
-    }
-
     public interface SizeListener {
         public void onGameSizeChanged();
     }
@@ -49,6 +48,14 @@ final public class Game {
         public void onGameMoleMove();
 
         public void onGameUserWon();
+    }
+
+    public Game(String mazeName) {
+        this.mazeName = mazeName;
+    }
+
+    public String getMazeName() {
+        return mazeName;
     }
 
     public void addSizeListener(SizeListener listener) {
@@ -234,12 +241,16 @@ final public class Game {
             return false;
         }
 
+        GameState prevState = currentState;
         GameState state = history.undo();
         if (state == null) {
             return false;
         }
         currentState = state;
         --stepCount;
+        if (boxChanged(prevState, state)) {
+            --stepWithLoadCount;
+        }
         fireMoleMove();
         return true;
     }
@@ -252,18 +263,26 @@ final public class Game {
         if (!canRedo()) {
             return false;
         }
+        GameState prevState = currentState;
         GameState state = history.redo();
         if (state == null) {
             return false;
         }
         currentState = state;
         ++stepCount;
+        if (boxChanged(prevState, state)) {
+            ++stepWithLoadCount;
+        }
         fireMoleMove();
         return true;
     }
 
     public int getStepCount() {
         return stepCount;
+    }
+
+    public int getStepWithLoadCount() {
+        return stepWithLoadCount;
     }
 
     private Field field = null;
@@ -273,6 +292,8 @@ final public class Game {
     private List<SizeListener> sizeListeners = new ArrayList<SizeListener>();
     private List<ActionListener> actionListeners = new ArrayList<ActionListener>();
     private int stepCount = 0;
+    private int stepWithLoadCount = 0;
+    private String mazeName = "";
 
     protected boolean tryToMoveMole(MoleMovementDirection direction) {
         if (!canMoveMole(direction)) {
@@ -357,6 +378,7 @@ final public class Game {
             Point box = currentState.boxes.get(index);
             if (box.equals(newMoleLocation)) {
                 box.translate(offset.x, offset.y);
+                ++stepWithLoadCount;
                 break;
             }
         }
@@ -406,6 +428,15 @@ final public class Game {
         for (ActionListener listener : actionListeners) {
             listener.onGameUserWon();
         }
+    }
+
+    private static boolean boxChanged(GameState state1, GameState state2) {
+        if (state1 == null || state2 == null) {
+            return true;
+        }
+        HashSet<Point> boxSet1 = new HashSet<Point>(state1.boxes);
+        HashSet<Point> boxSet2 = new HashSet<Point>(state2.boxes);
+        return !Objects.equals(boxSet1, boxSet2);
     }
 
     private enum CellDataByte {

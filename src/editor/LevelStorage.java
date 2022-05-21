@@ -88,7 +88,7 @@ public class LevelStorage {
             if (lines == null) {
                 return null;
             }
-            Game game = new Game();
+            Game game = new Game(file.getName());
             if (game.loadGame(lines)) {
                 return game;
             }
@@ -125,7 +125,7 @@ public class LevelStorage {
                 while ((line = reader.readLine()) != null) {
                     lines.add(line);
                 }
-                Game game = new Game();
+                Game game = new Game(Integer.toString(index));
                 if (game.loadGame(lines)) {
                     return game;
                 }

@@ -64,7 +64,7 @@ public class EditorPanel extends GamePanelBase
         setMargins(new Margins(sidebarWidth, 0, 0, 0));
         callback = editorPanelCallback;
 
-        setGame(new Game());
+        setGame(new Game(""));
         getGame().setFieldSize(new Dimension(DEFAULT_FIELD_WIDTH, DEFAULT_FIELD_HEIGHT));
 
         initControls();

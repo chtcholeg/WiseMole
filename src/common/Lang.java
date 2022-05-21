@@ -30,7 +30,8 @@ public class Lang {
         PLAY, CREATE, CONTINUE, SELECT_PREDEFINED, LOAD_FROM_FILE, EXIT, WIDTH, HEIGHT, SAVE, GO_BACK,
         DIALOG_OVERWRITE_CONFIRM_TITLE, DIALOG_OVERWRITE_CONFIRM_TEXT, DIALOG_GAME_VALIDATION_TEXT,
         ERROR_THERE_IS_NO_MOLE, ERROR_TARGET_POINTS_MORE_THAN_BOXES, WISE_MOLE_LEVEL_FILE_DESCRIPTION, VICTORY,
-        STATUSBAR_SETP_COUNT_LABEL
+        STATUSBAR_GAME_LABEL, STATUSBAR_STEP_COUNT_LABEL, STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL, STATUSBAR_MAZE_LABEL,
+        STATUSBAR_EXIT_LABEL
     }
 
     public static String get(Res res) {
@@ -69,8 +70,16 @@ public class Lang {
                 return "Wise Mole level file";
             case VICTORY:
                 return "Victory!";
-            case STATUSBAR_SETP_COUNT_LABEL:
+            case STATUSBAR_GAME_LABEL:
+                return "GAME";
+            case STATUSBAR_STEP_COUNT_LABEL:
                 return "Steps: ";
+            case STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL:
+                return "Steps with a load: ";
+            case STATUSBAR_MAZE_LABEL:
+                return "Maze: ";
+            case STATUSBAR_EXIT_LABEL:
+                return "Exit: ";
             default:
                 return "<Unknown>";
         }

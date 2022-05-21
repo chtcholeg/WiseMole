@@ -50,7 +50,9 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
 
     public GamePanel(Game passedGame, Callback gamePanelCallback) {
         topStatusBarHeight = stepCountValueLabel.getIdealHeight() + 2 * PADDING;
-        setMargins(new Margins(0, topStatusBarHeight, 0, 0));
+        bottomStatusBarHeight = exitHotKeyValueLabel.getIdealHeight() + 2 * PADDING;
+
+        setMargins(new Margins(0, bottomStatusBarHeight, 0, bottomStatusBarHeight));
 
         callback = gamePanelCallback;
         setGame(passedGame);
@@ -126,6 +128,7 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
     @Override
     public void onGameMoleMove() {
         stepCountValueLabel.setText(Integer.toString(getGame().getStepCount()));
+        stepCountWithLoadValueLabel.setText(Integer.toString(getGame().getStepWithLoadCount()));
         repaint();
     }
 
@@ -139,6 +142,9 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
     protected Rectangle calcBarArea(PanelBar bar) {
         if (bar == topStatusBar) {
             return calcTopStatusBarRect();
+        }
+        if (bar == bottomStatusBar) {
+            return calcBottomStatusBarRect();
         }
         return null;
     }
@@ -187,9 +193,24 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
     }
 
     private void initControls() {
-        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_SETP_COUNT_LABEL)), true);
+        // Top status bar
+        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_GAME_LABEL)), true);
+        topStatusBar.addStretchableSpacer(true);
+        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_STEP_COUNT_LABEL)), true);
         topStatusBar.addControl(stepCountValueLabel, true);
+        topStatusBar.addStretchableSpacer(true);
+        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL)), true);
+        topStatusBar.addControl(stepCountWithLoadValueLabel, true);
+        topStatusBar.addStretchableSpacer(true);
+        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_MAZE_LABEL)), true);
+        topStatusBar.addControl(new LabelControl(getGame().getMazeName(), Alignment.LEFT, STEP_VALUE_COUNT_LABEL_WIDTH),
+                true);
         addBar(topStatusBar);
+
+        // Bottom status bar
+        bottomStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_EXIT_LABEL)), true);
+        bottomStatusBar.addControl(exitHotKeyValueLabel, true);
+        addBar(bottomStatusBar);
     }
 
     private Rectangle calcTopStatusBarRect() {
@@ -198,10 +219,25 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         return result;
     }
 
+    private Rectangle calcBottomStatusBarRect() {
+        Rectangle result = new Rectangle(0, getSize().height - topStatusBarHeight, getSize().width, topStatusBarHeight);
+        RectangleUtils.deflateRect(result, PADDING, PADDING);
+        return result;
+    }
+
+    private static int STEP_VALUE_COUNT_LABEL_WIDTH = 50;
     private boolean userWon = false;
     private Callback callback = null;
+    // Top status bar
     private int topStatusBarHeight = NumericLeftRightControl.getImageHeight() + 2 * PADDING;
     private PanelBar topStatusBar = new PanelBar(true);
-    private LabelControl stepCountValueLabel = new LabelControl("0", Alignment.LEFT, 200);
+    private LabelControl stepCountValueLabel = new LabelControl("0", Alignment.LEFT, STEP_VALUE_COUNT_LABEL_WIDTH);
+    private LabelControl stepCountWithLoadValueLabel = new LabelControl("0", Alignment.LEFT,
+            STEP_VALUE_COUNT_LABEL_WIDTH);
+    // Bottom status bar
+    private int bottomStatusBarHeight = NumericLeftRightControl.getImageHeight() + 2 * PADDING;
+    private PanelBar bottomStatusBar = new PanelBar(true);
+    private LabelControl exitHotKeyValueLabel = new LabelControl("Esc", Alignment.LEFT, STEP_VALUE_COUNT_LABEL_WIDTH);
+
     private static final long serialVersionUID = 1L;
 }

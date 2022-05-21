@@ -16,6 +16,8 @@
 
 package common.controls;
 
+import java.awt.Dimension;
+
 /**
  * The {@SpaceControl} is class presents empty space.
  * 
@@ -26,22 +28,34 @@ package common.controls;
 public class SpaceControl extends ControlBase {
     final public static String TYPE = "Space";
 
+    // Constructor for stretchable spacer
+    public SpaceControl() {
+        super(TYPE, "");
+    }
+
+    // Constructors for fix-size spacer
     public SpaceControl(int controlWidth, int controlHeight) {
         super(TYPE, "");
-        width = controlWidth;
-        height = controlHeight;
+        size = new Dimension(controlWidth, controlHeight);
+    }
+
+    public SpaceControl(int size) {
+        this(size, size);
+    }
+
+    public boolean isStretchable() {
+        return size == null;
     }
 
     @Override
     public int getIdealHeight() {
-        return height;
+        return (size != null) ? size.height : 0;
     }
 
     @Override
     public int getIdealWidth() {
-        return width;
+        return (size != null) ? size.width : 0;
     }
 
-    private int width = 0;
-    private int height = 0;
+    private Dimension size = null;
 }
