@@ -33,8 +33,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import common.Lang;
 import game.Game;
+import localization.L10n;
 
 /**
  * The {@LevelStorage} is responsible for saving a level
@@ -48,8 +48,8 @@ public class LevelStorage {
     static public void save(Component dialogParent, Game game) throws IOException {
         final String issue = validateGame(game);
         if ((issue != null) && !issue.isEmpty()) {
-            final String text = Lang.get(Lang.Res.DIALOG_GAME_VALIDATION_TEXT, issue);
-            if (JOptionPane.showConfirmDialog(dialogParent, text, Lang.get(Lang.Res.DIALOG_OVERWRITE_CONFIRM_TITLE),
+            final String text = L10n.get(L10n.Id.DIALOG_GAME_VALIDATION_TEXT, issue);
+            if (JOptionPane.showConfirmDialog(dialogParent, text, L10n.get(L10n.Id.DIALOG_OVERWRITE_CONFIRM_TITLE),
                     JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                 return;
             }
@@ -72,7 +72,7 @@ public class LevelStorage {
     static public Game loadFromFile(Component dialogParent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(
-                new FileNameExtensionFilter(Lang.get(Lang.Res.WISE_MOLE_LEVEL_FILE_DESCRIPTION), LEVEL_FILE_EXTENSION));
+                new FileNameExtensionFilter(L10n.get(L10n.Id.WISE_MOLE_LEVEL_FILE_DESCRIPTION), LEVEL_FILE_EXTENSION));
         fileChooser.setAcceptAllFileFilterUsed(false);
         if (fileChooser.showOpenDialog(dialogParent) != JFileChooser.APPROVE_OPTION) {
             return null;
@@ -141,10 +141,10 @@ public class LevelStorage {
 
     static private String validateGame(Game game) {
         if (game.getMolePosition() == null) {
-            return Lang.get(Lang.Res.ERROR_THERE_IS_NO_MOLE);
+            return L10n.get(L10n.Id.ERROR_THERE_IS_NO_MOLE);
         }
         if (game.getBoxes().size() < game.getTargetPoints().size()) {
-            return Lang.get(Lang.Res.ERROR_TARGET_POINTS_MORE_THAN_BOXES);
+            return L10n.get(L10n.Id.ERROR_TARGET_POINTS_MORE_THAN_BOXES);
         }
 
         return null;
@@ -168,8 +168,8 @@ public class LevelStorage {
         }
         final Path filePath = Paths.get(absolutePath);
         if (Files.exists(filePath)) {
-            if (JOptionPane.showConfirmDialog(parentComponent, Lang.get(Lang.Res.DIALOG_OVERWRITE_CONFIRM_TEXT),
-                    Lang.get(Lang.Res.DIALOG_OVERWRITE_CONFIRM_TITLE),
+            if (JOptionPane.showConfirmDialog(parentComponent, L10n.get(L10n.Id.DIALOG_OVERWRITE_CONFIRM_TEXT),
+                    L10n.get(L10n.Id.DIALOG_OVERWRITE_CONFIRM_TITLE),
                     JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
                 return null;
             }

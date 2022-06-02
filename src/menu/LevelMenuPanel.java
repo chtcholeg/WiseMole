@@ -19,8 +19,8 @@ package menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.Lang;
 import editor.LevelStorage;
+import localization.L10n;
 
 /**
  * The {@LevelMenuPanel} is a panel that display menu to select predefined level
@@ -76,7 +76,7 @@ public class LevelMenuPanel extends MenuPanelBase {
 
     @Override
     protected String convertIdToString(Integer index) {
-        return (index == 0) ? Lang.get(Lang.Res.GO_BACK) : "Level " + index.toString();
+        return (index == 0) ? L10n.get(L10n.Id.GO_BACK) : "Level " + index.toString();
     }
 
 }

@@ -27,8 +27,8 @@ import menu.MainMenuPanel;
 import utils.ImageStorage;
 
 /**
- * The {@Application} class is main class of Application. It: - contains
- * application entry point (function 'main') - initializes application
+ * The {@Application} class is main class of Application. It: 1. contains
+ * application entry point (function 'main') 2. initializes application
  * 
  * @author olegshchepilov
  *

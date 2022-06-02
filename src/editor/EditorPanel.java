@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.Lang;
 import common.PanelBar;
 import common.controls.ButtonControl;
 import common.controls.ControlBase;
@@ -42,6 +41,7 @@ import common.controls.NumericLeftRightControl;
 import game.Cell;
 import game.Game;
 import game.GamePanelBase;
+import localization.L10n;
 import utils.Margins;
 import utils.PanelUtils;
 import utils.RectangleUtils;
@@ -254,20 +254,20 @@ public class EditorPanel extends GamePanelBase
         addClickableTopImage("floor.png", FLOOR_CONTROL_ID);
 
         sidebar.addSpacer(true, PADDING);
-        addTopLabel(Lang.Res.HEIGHT);
+        addTopLabel(L10n.Id.HEIGHT);
         sidebar.addSpacer(true, PADDING / 2);
         addTopNumericLeftRightControl(1, Game.MAX_FIELD_HEIGHT, DEFAULT_FIELD_HEIGHT, HEIGHT_CONTROL_ID);
 
         sidebar.addSpacer(true, PADDING);
-        addTopLabel(Lang.Res.WIDTH);
+        addTopLabel(L10n.Id.WIDTH);
         sidebar.addSpacer(true, PADDING / 2);
         addTopNumericLeftRightControl(1, Game.MAX_FIELD_WIDTH, DEFAULT_FIELD_WIDTH, WIDTH_CONTROL_ID);
 
         sidebar.addSpacer(false, PADDING);
-        addClickableBottomButton(Lang.Res.SAVE, SAVE_BUTTON_CONTROL_ID);
+        addClickableBottomButton(L10n.Id.SAVE, SAVE_BUTTON_CONTROL_ID);
 
         sidebar.addSpacer(false, PADDING);
-        addClickableBottomButton(Lang.Res.EXIT, EXIT_BUTTON_CONTROL_ID);
+        addClickableBottomButton(L10n.Id.EXIT, EXIT_BUTTON_CONTROL_ID);
 
         addBar(sidebar);
     }
@@ -276,16 +276,16 @@ public class EditorPanel extends GamePanelBase
         addClickableControl(new ImageControl(resourceId, controlId, true), true);
     }
 
-    private void addTopLabel(Lang.Res stringId) {
-        sidebar.addControl(new LabelControl(Lang.get(stringId), LabelControl.Alignment.CENTER), true);
+    private void addTopLabel(L10n.Id stringId) {
+        sidebar.addControl(new LabelControl(L10n.get(stringId), LabelControl.Alignment.CENTER), true);
     }
 
     private void addTopNumericLeftRightControl(int min, int max, int initValue, String controlId) {
         sidebar.addControl(new NumericLeftRightControl(min, max, initValue, controlId, this), true);
     }
 
-    private void addClickableBottomButton(Lang.Res stringId, String controlId) {
-        addClickableControl(new ButtonControl(Lang.get(stringId), controlId), false);
+    private void addClickableBottomButton(L10n.Id stringId, String controlId) {
+        addClickableControl(new ButtonControl(L10n.get(stringId), controlId), false);
     }
 
     private void addClickableControl(ControlBase control, boolean top) {

@@ -19,7 +19,7 @@ package menu;
 import java.util.Arrays;
 import java.util.List;
 
-import common.Lang;
+import localization.L10n;
 
 /**
  * The {@MainMenuPanel} is a panel that display main menu of the game
@@ -108,17 +108,17 @@ public class MainMenuPanel extends MenuPanelBase {
     protected String convertIdToString(Integer id) {
         switch (id) {
             case ItemId.PLAY:
-                return Lang.get(Lang.Res.PLAY);
+                return L10n.get(L10n.Id.PLAY);
             case ItemId.CONTINUE:
-                return Lang.get(Lang.Res.CONTINUE);
+                return L10n.get(L10n.Id.CONTINUE);
             case ItemId.SELECT_PREDEFINED:
-                return Lang.get(Lang.Res.SELECT_PREDEFINED);
+                return L10n.get(L10n.Id.SELECT_PREDEFINED);
             case ItemId.LOAD_FROM_FILE:
-                return Lang.get(Lang.Res.LOAD_FROM_FILE);
+                return L10n.get(L10n.Id.LOAD_FROM_FILE);
             case ItemId.CREATE:
-                return Lang.get(Lang.Res.CREATE);
+                return L10n.get(L10n.Id.CREATE);
             case ItemId.EXIT:
-                return Lang.get(Lang.Res.EXIT);
+                return L10n.get(L10n.Id.EXIT);
             case ItemId.UNKNOWN:
                 return "<Unknown>";
             default:

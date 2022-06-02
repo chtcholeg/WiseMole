@@ -24,11 +24,11 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import common.Lang;
 import common.PanelBar;
 import common.controls.LabelControl;
 import common.controls.LabelControl.Alignment;
 import common.controls.NumericLeftRightControl;
+import localization.L10n;
 import utils.FontUtils;
 import utils.Margins;
 import utils.RectangleUtils;
@@ -161,7 +161,7 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         Font currentFont = getFont();
         Font newFont = new Font(currentFont.getFontName(), currentFont.getStyle(), radius);
         graphics.setFont(newFont);
-        final String text = Lang.get(Lang.Res.VICTORY);
+        final String text = L10n.get(L10n.Id.VICTORY);
         FontMetrics metrics = graphics.getFontMetrics();
         final int fontHeight = FontUtils.getFontHeight(metrics);
         final int textWidth = metrics.stringWidth(text);
@@ -194,21 +194,21 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
 
     private void initControls() {
         // Top status bar
-        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_GAME_LABEL)), true);
+        topStatusBar.addControl(new LabelControl(L10n.get(L10n.Id.STATUSBAR_GAME_LABEL)), true);
         topStatusBar.addStretchableSpacer(true);
-        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_STEP_COUNT_LABEL)), true);
+        topStatusBar.addControl(new LabelControl(L10n.get(L10n.Id.STATUSBAR_STEP_COUNT_LABEL)), true);
         topStatusBar.addControl(stepCountValueLabel, true);
         topStatusBar.addStretchableSpacer(true);
-        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL)), true);
+        topStatusBar.addControl(new LabelControl(L10n.get(L10n.Id.STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL)), true);
         topStatusBar.addControl(stepCountWithLoadValueLabel, true);
         topStatusBar.addStretchableSpacer(true);
-        topStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_MAZE_LABEL)), true);
+        topStatusBar.addControl(new LabelControl(L10n.get(L10n.Id.STATUSBAR_MAZE_LABEL)), true);
         topStatusBar.addControl(new LabelControl(getGame().getMazeName(), Alignment.LEFT, STEP_VALUE_COUNT_LABEL_WIDTH),
                 true);
         addBar(topStatusBar);
 
         // Bottom status bar
-        bottomStatusBar.addControl(new LabelControl(Lang.get(Lang.Res.STATUSBAR_EXIT_LABEL)), true);
+        bottomStatusBar.addControl(new LabelControl(L10n.get(L10n.Id.STATUSBAR_EXIT_LABEL)), true);
         bottomStatusBar.addControl(exitHotKeyValueLabel, true);
         addBar(bottomStatusBar);
     }
