@@ -22,6 +22,7 @@ import editor.EditorPanel;
 import editor.LevelStorage;
 import game.Game;
 import game.GamePanel;
+import localization.L10n;
 import menu.LevelMenuPanel;
 import menu.MainMenuPanel;
 import utils.ImageStorage;
@@ -51,7 +52,7 @@ public class Application extends JFrame
         setSize(ApplicationDefines.DEFAULT_FRAME_SIZE);
         setMinimumSize(ApplicationDefines.DEFAULT_FRAME_SIZE);
 
-        setTitle("Wise Mole");
+        setTitle(L10n.get(L10n.Id.TITLE));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }

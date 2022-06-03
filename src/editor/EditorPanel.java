@@ -60,7 +60,7 @@ public class EditorPanel extends GamePanelBase
     }
 
     public EditorPanel(Callback editorPanelCallback) {
-        sidebarWidth = NumericLeftRightControl.getImageWidth() + 2 * PADDING;
+        sidebarWidth = Math.max(sidebarWidth, NumericLeftRightControl.getImageWidth() + 2 * PADDING);
         setMargins(new Margins(sidebarWidth, 0, 0, 0));
         callback = editorPanelCallback;
 
@@ -396,7 +396,7 @@ public class EditorPanel extends GamePanelBase
 
     private Callback callback = null;
     private PanelBar sidebar = new PanelBar(false);
-    private int sidebarWidth = 100;
+    private int sidebarWidth = 150;
     private FieldType selectedFieldType = FieldType.NULL;
     private static final int DEFAULT_FIELD_WIDTH = 25;
     private static final int DEFAULT_FIELD_HEIGHT = 15;

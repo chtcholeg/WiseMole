@@ -31,6 +31,7 @@ public class L10n {
     public static String locale = "en";
 
     public enum Id {
+        TITLE,
         PLAY,
         CREATE,
         CONTINUE,
@@ -57,6 +58,17 @@ public class L10n {
 
     public static String get(Id stringId) {
         switch (stringId) {
+            case TITLE:
+                switch (locale) {
+                    case "en":
+                        return "Wise Mole";
+                    case "ru":
+                        return "Мудрый крот";
+                    case "insl":
+                        return "Mudry krot";
+                    default:
+                        return "{Missing(" + locale + "):TITLE}";
+                }
             case PLAY:
                 switch (locale) {
                     case "en":
@@ -106,9 +118,9 @@ public class L10n {
                     case "en":
                         return "Load";
                     case "ru":
-                        return "Загрузить";
+                        return "Открыть файл";
                     case "insl":
-                        return "Dodati";
+                        return "Odkryti fail";
                     default:
                         return "{Missing(" + locale + "):LOAD_FROM_FILE}";
                 }
@@ -174,7 +186,7 @@ public class L10n {
                     case "ru":
                         return "Подтверждение сохранения";
                     case "insl":
-                        return "Potvrdženje shranjenja";
+                        return "Potvrdzenje shranjenja";
                     default:
                         return "{Missing(" + locale + "):DIALOG_OVERWRITE_CONFIRM_TITLE}";
                 }
@@ -184,6 +196,8 @@ public class L10n {
                         return "File already exists. Do you want to replace it?";
                     case "ru":
                         return "Файл уже существует. Хотите его заменить?";
+                    case "insl":
+                        return "Fajl uze jestvuje. Hotejete jego zameniti?";
                     default:
                         return "{Missing(" + locale + "):DIALOG_OVERWRITE_CONFIRM_TEXT}";
                 }
@@ -193,6 +207,8 @@ public class L10n {
                         return "There is an issue: {0}. Do you want to save the level?";
                     case "ru":
                         return "Есть ошибка: {0}. Хотите сохранить уровень?";
+                    case "insl":
+                        return "Jest pogreska: {0}. Hotejete shraniti uravenj?";
                     default:
                         return "{Missing(" + locale + "):DIALOG_GAME_VALIDATION_TEXT}";
                 }
@@ -202,6 +218,8 @@ public class L10n {
                         return "there is no mole on the field";
                     case "ru":
                         return "на поле нет крота";
+                    case "insl":
+                        return "krot ne jest na polju";
                     default:
                         return "{Missing(" + locale + "):ERROR_THERE_IS_NO_MOLE}";
                 }
@@ -211,6 +229,8 @@ public class L10n {
                         return "target point count is more than box count";
                     case "ru":
                         return "целевых точек больше чем ящиков";
+                    case "insl":
+                        return "kolikost celjevyh tocek jest bolje cem skrinej";
                     default:
                         return "{Missing(" + locale + "):ERROR_TARGET_POINTS_MORE_THAN_BOXES}";
                 }
@@ -220,6 +240,8 @@ public class L10n {
                         return "Wise Mole level file";
                     case "ru":
                         return "Файл уровня \"Мудрый крот\"";
+                    case "insl":
+                        return "Fail uravenja \"Mudry krot\"";
                     default:
                         return "{Missing(" + locale + "):WISE_MOLE_LEVEL_FILE_DESCRIPTION}";
                 }
@@ -229,6 +251,8 @@ public class L10n {
                         return "Victory!";
                     case "ru":
                         return "Победа!";
+                    case "insl":
+                        return "Pobeda!";
                     default:
                         return "{Missing(" + locale + "):VICTORY}";
                 }
@@ -238,6 +262,8 @@ public class L10n {
                         return "GAME";
                     case "ru":
                         return "ИГРА";
+                    case "insl":
+                        return "IGRA";
                     default:
                         return "{Missing(" + locale + "):STATUSBAR_GAME_LABEL}";
                 }
@@ -247,6 +273,8 @@ public class L10n {
                         return "Steps: ";
                     case "ru":
                         return "Шаги: ";
+                    case "insl":
+                        return "Kroky: ";
                     default:
                         return "{Missing(" + locale + "):STATUSBAR_STEP_COUNT_LABEL}";
                 }
@@ -256,6 +284,8 @@ public class L10n {
                         return "Steps with a load: ";
                     case "ru":
                         return "Шаги с грузом: ";
+                    case "insl":
+                        return "Kroky s bremenem: ";
                     default:
                         return "{Missing(" + locale + "):STATUSBAR_STEP_COUNT_WITH_LOAD_LABEL}";
                 }
@@ -265,6 +295,8 @@ public class L10n {
                         return "Maze: ";
                     case "ru":
                         return "Уровень: ";
+                    case "insl":
+                        return "Uravenj: ";
                     default:
                         return "{Missing(" + locale + "):STATUSBAR_MAZE_LABEL}";
                 }
@@ -274,6 +306,8 @@ public class L10n {
                         return "Exit: ";
                     case "ru":
                         return "Выход: ";
+                    case "insl":
+                        return "Izhod: ";
                     default:
                         return "{Missing(" + locale + "):STATUSBAR_EXIT_LABEL}";
                 }
