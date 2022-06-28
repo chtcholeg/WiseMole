@@ -375,7 +375,7 @@ public class EditorPanel extends GamePanelBase
         final ControlBase control = getControlUnderPoint(mousePos);
         if (control == null) {
             final Point coordinates = findCellUnderPoint((Point) mousePos.clone());
-            if (coordinates != null) {
+            if ( (coordinates != null) && (e.getButton() != MouseEvent.NOBUTTON) ) {
                 FieldType fieldType = (e.getButton() == MouseEvent.BUTTON1) ? selectedFieldType : FieldType.NULL;
                 applySelectedCell(coordinates, fieldType);
             }

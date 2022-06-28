@@ -95,7 +95,7 @@ public class LabelControl extends ControlBase {
         }
         int y = position.y + position.height;
         FontMetrics metrics = graphics.getFontMetrics();
-        final int fontHeight = FontUtils.getFontHeight(metrics);
+        final int fontHeight = FontUtils.getFontHeight(graphics.getFont());
         y -= (position.height - fontHeight) / 2;
         int x = position.x;
         if (alignment == Alignment.CENTER) {

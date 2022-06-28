@@ -184,8 +184,8 @@ public class MenuPanelBase extends PanelBase implements KeyListener, MouseListen
         final int itemOffset = 10;
         renderedContent.menuTotalSize = new Dimension(0, 0);
         FontMetrics fontMetrics = graphics.getFontMetrics();
-        final int fontHeight = FontUtils.getFontHeight(fontMetrics);
-
+        final int fontHeight = FontUtils.getFontHeight(graphics.getFont());
+        
         for (Integer itemId : items) {
             ItemBlock block = new ItemBlock();
             block.id = itemId;

@@ -31,13 +31,20 @@ import java.awt.geom.Rectangle2D;
 
 public class FontUtils {
 
-    public static int getFontHeight(FontMetrics metrics) {
+    /*public static int getFontHeight(FontMetrics metrics) {
         final int originalFontHeight = metrics.getHeight();
         FontRenderContext context = metrics.getFontRenderContext();
         AffineTransform transform = context.getTransform();
         return (int) (originalFontHeight / transform.getScaleY());
-    }
+    }*/
 
+    public static int getFontHeight(Font font) {
+    	AffineTransform affinetransform = new AffineTransform();
+        FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
+        Rectangle2D rect = font.getStringBounds("Wp", frc);
+        return Math.abs((int) rect.getY());
+    }
+    
     public static int calculateTextWidth(Font font, String text) {
         AffineTransform affinetransform = new AffineTransform();
         FontRenderContext frc = new FontRenderContext(affinetransform, true, true);

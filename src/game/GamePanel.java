@@ -163,7 +163,7 @@ public class GamePanel extends GamePanelBase implements KeyListener, Game.Action
         graphics.setFont(newFont);
         final String text = L10n.get(L10n.Id.VICTORY);
         FontMetrics metrics = graphics.getFontMetrics();
-        final int fontHeight = FontUtils.getFontHeight(metrics);
+        final int fontHeight = FontUtils.getFontHeight(graphics.getFont());
         final int textWidth = metrics.stringWidth(text);
         final int x = fieldArea.x + (fieldArea.width - textWidth) / 2;
         final int y = fieldArea.y + (fieldArea.height + fontHeight) / 2;
